@@ -1,4 +1,5 @@
 import { initTRPC } from "@trpc/server";
+import superjson from "superjson"
 
 /**
  * Initialization of tRPC backend
@@ -6,7 +7,9 @@ import { initTRPC } from "@trpc/server";
  */
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
-const t = initTRPC.create();
+const t = initTRPC.create({
+  transformer: superjson, 
+});
 
 /**
  * Export reusable router and procedure helpers

@@ -1,0 +1,140 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { CreativeGalleryView } from "@/app/test/creative-gallery-view"
+import { CreativeTableView } from "@/app/test/creative-table-view"
+import { CreativeDetailView } from "@/app/test/creative-detail-view"
+import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
+import { LayoutGrid, List, X } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+
+export function CreativeLibrary({
+  creatives,
+  campaigns,
+}: {
+  creatives: CreativeList
+  campaigns: CampaignList
+}) {
+  const [view, setView] = useState<"gallery" | "table">("gallery")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [campaignFilter, setCampaignFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [selectedCreative, setSelectedCreative] = useState<CreativeObj | null>(null)
+
+  const filteredCreatives = useMemo(() => {
+    return creatives.filter((creative) => {
+      const campaignName = creative.campaign?.name || ""
+      const matchesSearch =
+        creative.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        campaignName.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCampaign = campaignFilter === "all" || creative.campaignId === campaignFilter
+      const matchesStatus = statusFilter === "all" || creative.approvalStatus === statusFilter
+      return matchesSearch && matchesCampaign && matchesStatus
+    })
+  }, [creatives, searchTerm, campaignFilter, statusFilter])
+
+  const handleViewDetails = (creative: CreativeObj) => {
+    setSelectedCreative(creative)
+  }
+
+  const resetFilters = () => {
+    setSearchTerm("")
+    setCampaignFilter("all")
+    setStatusFilter("all")
+  }
+
+  const areFiltersActive = searchTerm !== "" || campaignFilter !== "all" || statusFilter !== "all"
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <Input
+            placeholder="Search by creative or campaign name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-sm"
+          />
+          <div className="flex-1 flex items-center gap-2">
+            <Select value={campaignFilter} onValueChange={setCampaignFilter}>
+              <SelectTrigger className="w-full md:w-[200px]">
+                <SelectValue placeholder="Filter by campaign" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campaigns</SelectItem>
+                {(campaigns).map((c) => (
+                  <SelectItem key={c?.id} value={c?.id || "-"}>
+                    {c?.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="APPROVED">Approved</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="REJECTED">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            {areFiltersActive && (
+              <Button variant="ghost" onClick={resetFilters}>
+                <X className="h-4 w-4 mr-2" />
+                Reset
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={view === "gallery" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setView("gallery")}
+              aria-label="Gallery View"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </Button>
+            <Button
+              variant={view === "table" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setView("table")}
+              aria-label="Table View"
+            >
+              <List className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div>
+        {view === "gallery" ? (
+          <CreativeGalleryView creatives={filteredCreatives} onViewDetails={handleViewDetails} />
+        ) : (
+          <CreativeTableView creatives={filteredCreatives} onViewDetails={handleViewDetails} />
+        )}
+      </div>
+
+      <Dialog open={!!selectedCreative} onOpenChange={(isOpen) => !isOpen && setSelectedCreative(null)}>
+        <DialogContent className="max-w-4xl">
+          {selectedCreative && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedCreative.name}</DialogTitle>
+              </DialogHeader>
+              <CreativeDetailView creative={selectedCreative} />
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+

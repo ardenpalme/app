@@ -1,38 +1,51 @@
 "use client"
 
-import { trpc } from "../_trpc/client";
+import { useState } from "react"
+import { trpc } from "@/app/_trpc/client"
+import { Loader2, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { AddAssetDialog } from "./add-assets-dialog"
+import { CreativeLibrary } from "./creative-library"
 
-const Test = () => {
-  const {data, isError, isPending} = trpc.test.getAllUsers.useQuery();
-  console.log(data)
+export default function CreativesPage() {
+  const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const { data: allCreatives, isLoading: isLoadingCreatives, refetch } = trpc.creative.listAll.useQuery()
+  const { data: campaignsForFilter, isLoading: isLoadingCampaigns } = trpc.campaign.listForSelect.useQuery()
 
-  if(isError || isPending) {
-    return (
-      <div>
-        <p>loading...</p>
-      </div>
-    );
+  const handleUploadSuccess = () => {
+    refetch()
+    setUploadDialogOpen(false)
   }
 
+  if (isLoadingCreatives || isLoadingCampaigns) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+  console.log("top page", allCreatives);
+
   return (
-    <div>
-      <ul>
-      {data.map((user) => (
-          <li key={user.id}>{user.email}</li>
-      ))}
-      </ul>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Creative Library</h1>
+          <p className="text-muted-foreground">Browse and manage all creative assets across your campaigns.</p>
+        </div>
+        <Button onClick={() => setUploadDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Upload Creative
+        </Button>
+      </div>
+      <CreativeLibrary creatives={allCreatives?.json || []} campaigns={campaignsForFilter?.json || []} />
+      <AddAssetDialog
+        open={isUploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onUploadSuccess={handleUploadSuccess}
+        mode="default"
+      />
     </div>
-  );
-
+  )
 }
-
-export default function TestPage() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-    <p>index pg</p>
-    <Test />
-    </div>
-  );
-}
-
 

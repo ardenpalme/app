@@ -1,0 +1,69 @@
+import { z } from 'zod'
+import { CreativeApprovalStatus, CampaignStatus } from '@prisma/client'
+
+export const creativeFormSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  notes: z.string().nullable(),
+  tags: z.array(z.string()),
+  proofOfPlay: z.boolean(),
+
+  fileUrl: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  duration: z.float64().optional(),
+
+  orgId: z.string(),
+  submittedBy: z.string(),
+  submissionDate: z.date(),
+});
+
+export const creativeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  notes: z.string().nullable().optional(),
+  tags: z.array(z.string()),
+  approvalStatus: z.enum(CreativeApprovalStatus), 
+
+  fileUrl: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  duration: z.float64().optional(),
+
+  campaignId: z.string().optional().nullable(),
+  campaign: z.object({
+    id: z.string(),
+    name: z.string(),
+    status: z.enum(CampaignStatus), 
+  }).optional().nullable(),
+
+  submittedBy: z.string(),
+  submissionDate: z.date(),
+});
+
+export const unassignedCreativeListSchema = z.array(creativeSchema);
+
+export const campaignSchema = z.array(z.object({
+  id: z.string(),
+  name: z.string(),
+}).optional().nullable());
+
+export const creativeListSchema = z.array(creativeSchema);
+
+export const mediaMetadataSchema = z.object({
+  width: z.number().optional(),
+  height: z.number().optional(),
+  duration: z.number().optional(),
+})
+
+export type CreativeForm = z.infer<typeof creativeFormSchema>
+export type MediaMetadata = z.infer<typeof mediaMetadataSchema>
+export type CreativeList = z.infer<typeof creativeListSchema>
+export type unassignedCreativeList = z.infer<typeof unassignedCreativeListSchema>
+
+export type CreativeObj = z.infer<typeof creativeSchema>
+export type CampaignList = z.infer<typeof campaignSchema>

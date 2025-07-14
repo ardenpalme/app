@@ -20,5 +20,3 @@ export const testRouter = router({
     }),
 });
 
-// export type definition of API
-export type TestRouter = typeof testRouter;
