@@ -24,7 +24,8 @@ export default function CreativesPage() {
       </div>
     )
   }
-  console.log("top page", allCreatives);
+  console.log("top page: creative", allCreatives);
+  console.log("top page: campaign", campaignsForFilter);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -38,7 +39,7 @@ export default function CreativesPage() {
           Upload Creative
         </Button>
       </div>
-      <CreativeLibrary creatives={allCreatives?.json || []} campaigns={campaignsForFilter?.json || []} />
+      <CreativeLibrary creatives={allCreatives} campaigns={campaignsForFilter} />
       <AddAssetDialog
         open={isUploadDialogOpen}
         onOpenChange={setUploadDialogOpen}

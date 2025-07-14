@@ -30,6 +30,7 @@ export const uploadFileToWorker = async (file: File, fname: string, signal: Abor
  * @returns A Promise that resolves to the file Blob.
  */
 export const downloadFileFromWorker = async (fname: string): Promise<Blob> => {
+  console.log(">>", fname)
   const res = await fetch(`${R2_WORKER_URL}/${fname}`, {
     headers: {
       "x-custom-psk": R2_PSK,
@@ -38,6 +39,7 @@ export const downloadFileFromWorker = async (fname: string): Promise<Blob> => {
   if (!res.ok) {
     throw new Error("Failed to download file.")
   }
+  console.log(">>", fname)
   return res.blob()
 }
 

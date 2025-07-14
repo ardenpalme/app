@@ -12,8 +12,6 @@ export const creativeRouter = router({
     .input(creativeFormSchema)
     .output(creativeSchema)
     .mutation(async ({input}) => {
-
-      console.log("HEREREREREREER")
       const addedCreative = await db.creative.create({ 
         data: {
           id: input.id,
@@ -51,6 +49,7 @@ export const creativeRouter = router({
           id: true,
           name: true,
           notes: true,
+          tags: true,
           approvalStatus: true,
 
           fileUrl: true,
@@ -132,6 +131,11 @@ export const campaignRouter = router({
           name: true,
         },
       });
-      return data;
+      const result = campaignSchema.safeParse(data);
+      if (!result.success) {
+        console.error(result.error.format()); // <-- clear error here
+        throw new Error("Schema validation failed");
+      }
+      return result.data;
     }),
 });

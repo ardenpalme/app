@@ -1,24 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+enum CampaignStatus {
+  draft
+  WAITING_FOR_APPROVAL
+  APPROVED
+  REJECTED
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+enum CreativeApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+
+model Campaign {
+  id             String         @id @default(cuid())
+  name           String
+  startDate      DateTime
+  endDate        DateTime
+  status         CampaignStatus @default(draft)
+  notes          String?
+  userId         String
+  orgId          String
+  creatives      Creative[]
+
+  submittedBy    String?
+  submissionDate DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([orgId])
+}
+
+model Creative {
+  id                 String                 @id @default(cuid())
+  name               String
+  notes              String?
+  tags               String[]               @default([])
+  approvalStatus     CreativeApprovalStatus @default(PENDING)
+  proofOfPlay        Boolean                @default(false)
+  orgId              String
+
+  // R2 Storage Metadata
+  // This is the unique key for the file in the R2 bucket, not a public URL.
+  fileUrl            String
+  fileType           String
+  fileSize           Int
+
+  // Media Metadata
+  width              Int?
+  height              Int?
+  duration           Float?
+
+  campaign           Campaign?              @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignId         String?
+
+  submittedBy        String
+  submissionDate     DateTime
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  @@index([orgId])
 }

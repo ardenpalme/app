@@ -11,6 +11,12 @@ import { CreativeDetailView } from "@/app/test/creative-detail-view"
 import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
 import { LayoutGrid, List, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 export function CreativeLibrary({
   creatives,
@@ -28,14 +34,23 @@ export function CreativeLibrary({
   const filteredCreatives = useMemo(() => {
     return creatives.filter((creative) => {
       const campaignName = creative.campaign?.name || ""
+
       const matchesSearch =
         creative.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         campaignName.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCampaign = campaignFilter === "all" || creative.campaignId === campaignFilter
-      const matchesStatus = statusFilter === "all" || creative.approvalStatus === statusFilter
+
+      const matchesCampaign =
+        campaignFilter === "all" ||
+        (campaignFilter !== "all" && creative.campaignId === campaignFilter)
+
+      const matchesStatus =
+        statusFilter === "all" || creative.approvalStatus === statusFilter
+
       return matchesSearch && matchesCampaign && matchesStatus
     })
   }, [creatives, searchTerm, campaignFilter, statusFilter])
+
+
 
   const handleViewDetails = (creative: CreativeObj) => {
     setSelectedCreative(creative)

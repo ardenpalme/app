@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, UploadCloud, X, CheckCircle, AlertCircle, FileVideo } from "lucide-react"
+import { Loader2, UploadCloud, X, CheckCircle, AlertCircle, FileVideo, CirclePlus } from "lucide-react"
 import { cn, formatBytes } from "@/lib/utils"
 import { uploadFileToWorker } from "@/lib/r2-worker"
 import { trpc } from "@/app/_trpc/client"
@@ -151,7 +151,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
         const fileExtension = file.name.split(".").pop()
         const fileName = `${cuid()}.${fileExtension}`
 
-        //await uploadFileToWorker(file, fileName, new AbortController().signal);
+        await uploadFileToWorker(file, fileName, new AbortController().signal);
 
         const in_creative = {
           id: cuid(),
@@ -203,47 +203,31 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
   const hasSuccessFiles = uploadingFiles.some((f) => f.status === "success")
 
   return (
-    <div className="p-1 flex flex-col h-[50vh]">
-      <div>
-        <div
-          className={cn(
-            "flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 p-6 text-center transition-colors",
-            isDragging && "border-primary bg-primary/10",
-          )}
-          onDragEnter={(e) => (e.preventDefault(), e.stopPropagation(), setIsDragging(true))}
-          onDragLeave={(e) => (e.preventDefault(), e.stopPropagation(), setIsDragging(false))}
-          onDragOver={(e) => (e.preventDefault(), e.stopPropagation())}
-          onDrop={(e) => (
-            e.preventDefault(), e.stopPropagation(), setIsDragging(false), handleFiles(e.dataTransfer.files)
-          )}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept=".mp4,.jpg,.jpeg,.png"
-            onChange={(e) => e.target.files && handleFiles(e.target.files)}
-            className="hidden"
-          />
-          <UploadCloud className="h-10 w-10 text-muted-foreground" />
-          <h3 className="mt-2 text-base font-semibold">Drag and drop files here</h3>
-          <p className="mt-1 text-xs text-muted-foreground">or</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-2 bg-transparent"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Browse Files
-          </Button>
-        </div>
-      </div>
+    <div className="p-1 flex flex-col h-full">
 
       <div className="mt-4 flex flex-col flex-1 min-h-0">
         {hasFiles ? (
           <div className="flex flex-col flex-1 min-h-0 space-y-2">
             <div className="flex items-center justify-between px-1">
               <h4 className="font-medium text-sm">Upload Queue ({uploadingFiles.length})</h4>
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept=".mp4,.jpg,.jpeg,.png"
+                  onChange={(e) => e.target.files && handleFiles(e.target.files)}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 bg-transparent"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <CirclePlus />
+                </Button>
+              </div>
               {hasSuccessFiles && (
                 <Button variant="ghost" size="sm" onClick={clearCompleted}>
                   Clear Completed
@@ -251,7 +235,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
               )}
             </div>
 
-            <ScrollArea className="flex-1 border rounded-md">
+            <ScrollArea className="flex-1 border rounded-md max-h-80 overflow-auto">
               <div className="p-2 space-y-2">
                 {uploadingFiles.map((f) => (
                   <div key={f.tempId} className="flex items-center gap-3 p-2 rounded-md bg-muted/50">
@@ -305,8 +289,37 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
             )}
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center border rounded-md bg-muted/20">
-            <p className="text-muted-foreground text-sm text-center">Drop files above to add them to the queue.</p>
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 p-6 text-center transition-colors",
+              isDragging && "border-primary bg-primary/10",
+            )}
+            onDragEnter={(e) => (e.preventDefault(), e.stopPropagation(), setIsDragging(true))}
+            onDragLeave={(e) => (e.preventDefault(), e.stopPropagation(), setIsDragging(false))}
+            onDragOver={(e) => (e.preventDefault(), e.stopPropagation())}
+            onDrop={(e) => (
+              e.preventDefault(), e.stopPropagation(), setIsDragging(false), handleFiles(e.dataTransfer.files)
+            )}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept=".mp4,.jpg,.jpeg,.png"
+              onChange={(e) => e.target.files && handleFiles(e.target.files)}
+              className="hidden"
+            />
+            <UploadCloud className="h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-2 text-base font-semibold">Drag and drop files here</h3>
+            <p className="mt-1 text-xs text-muted-foreground">or</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2 bg-transparent"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Browse Files
+            </Button>
           </div>
         )}
       </div>
