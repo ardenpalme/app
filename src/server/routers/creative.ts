@@ -5,7 +5,8 @@ import {
   creativeListSchema,
   creativeSchema,
   CreativeEditSchema,
-  creativeUpdateCampaignSchema
+  creativeUpdateCampaignSchema,
+  NewCampaignFormSchema
 } from '@/schemas/assets';
 import { db } from '../db'
 import {z} from 'zod'
@@ -220,5 +221,13 @@ export const campaignRouter = router({
       console.log(data);
       return data;
     }),
+
+    add: publicProcedure
+      .input(NewCampaignFormSchema)
+      .mutation(async ({input}) => {
+        const res = await db.campaign.create({ data : input });
+        console.log(res);
+    }),
+
 
 });

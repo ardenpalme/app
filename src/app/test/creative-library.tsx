@@ -74,7 +74,6 @@ export function CreativeLibrary({
   }
 
   const handleDelete = async (creative: CreativeObj) => {
-    await deleteFileFromWorker(creative.fileUrl);
     setDeleteCreative(creative)
   }
 
@@ -83,8 +82,9 @@ export function CreativeLibrary({
   const handleConfirmDelete = async () => {
     if(deleteCreative) {
       const data = await del({id: deleteCreative.id});
-      console.log(data)
+      deleteFileFromWorker(deleteCreative.fileUrl);
     }
+    onActionSuccess()
   }
 
   const resetFilters = () => {
@@ -160,7 +160,7 @@ export function CreativeLibrary({
 
       <Separator />
 
-      <ScrollArea className="h-full">
+      <ScrollArea className="max-h-[60vh] overflow-auto">
       {view === "gallery" ? (
         <CreativeGalleryView 
           creatives={filteredCreatives} 

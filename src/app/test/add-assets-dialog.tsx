@@ -220,7 +220,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
                   className="hidden"
                 />
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   className="mt-2 bg-transparent"
                   onClick={() => fileInputRef.current?.click()}

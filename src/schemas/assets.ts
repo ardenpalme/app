@@ -85,3 +85,15 @@ export const creativeUpdateCampaignSchema = z.object({
   campaignId: z.string(),
 });
 export type CreativeUpdateCampaignSchema = z.infer<typeof creativeUpdateCampaignSchema>
+
+export const NewCampaignFormSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+  notes: z.string(),
+  userId: z.string(),
+  orgId: z.string(),
+  submittedBy: z.string(),
+  submissionDate: z.date(),
+})

@@ -16,6 +16,7 @@ import { trpc } from "@/app/_trpc/client"
 import type { CreativeObj } from "@/schemas/assets"
 import { toast } from "sonner"
 import { CreativeUpdateCampaignSchema } from "@/schemas/assets"
+import { CreateCampaignDialog } from "./create-campaign-dialog"
 
 export function AssignCampaignDialog({
   creative,
