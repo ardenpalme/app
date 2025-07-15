@@ -4,8 +4,11 @@ import {
   campaignSchema,
   creativeListSchema,
   creativeSchema,
+  CreativeEditSchema,
+  creativeUpdateCampaignSchema
 } from '@/schemas/assets';
 import { db } from '../db'
+import {z} from 'zod'
 
 export const creativeRouter = router({
   add : publicProcedure
@@ -38,7 +41,37 @@ export const creativeRouter = router({
       }
 
       return result.data;
-  }),
+    }),
+
+  delete : publicProcedure
+    .input(z.object({
+      id: z.string()
+    }))
+    .mutation(async ({input}) => {
+      const data = await db.creative.delete({
+        where: {id: input.id}
+      });
+      return data;
+    }),
+
+  update : publicProcedure
+    .input(CreativeEditSchema)
+    .mutation(async ({input}) => {
+      const data = await db.creative.update({
+        where: {
+          id: input.id
+        },
+        data : {
+          name: input.name,
+          notes: input.notes,
+          tags: input.tags,
+          proofOfPlay: input.proofOfPlay,
+          submissionDate: input.submissionDate,
+          submittedBy: input.submittedBy
+        }
+      });
+      return data;
+    }),
 
   listUnassigned : publicProcedure
     .output(creativeListSchema)
@@ -118,6 +151,42 @@ export const creativeRouter = router({
       return result.data;
 
     }),
+
+    assignCampaign: publicProcedure
+      .input(creativeUpdateCampaignSchema)
+      .mutation(async ({input}) => {
+        const data = await db.creative.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            campaign: {
+              connect: {
+                id: input.campaignId,
+              },
+            },
+          },
+        });
+        console.log(data);
+        return data;
+    }),
+
+    unAssignCampaign: publicProcedure
+      .input(z.string())
+      .mutation(async ({input}) => {
+        const data = await db.creative.update({
+          where: {
+            id: input,
+          },
+          data: {
+            campaign: {
+              disconnect: true,
+            },
+          },
+        });
+        console.log(data);
+        return data;
+    }),
 });
 
 
@@ -138,4 +207,18 @@ export const campaignRouter = router({
       }
       return result.data;
     }),
+
+  listAll : publicProcedure
+    .output(campaignSchema)
+    .query(async () => {
+      const data = db.campaign.findMany({
+        select : {
+          id: true,
+          name: true,
+        }
+      });
+      console.log(data);
+      return data;
+    }),
+
 });

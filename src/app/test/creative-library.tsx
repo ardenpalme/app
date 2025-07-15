@@ -2,34 +2,44 @@
 
 import { useState, useMemo } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CreativeGalleryView } from "@/app/test/creative-gallery-view"
 import { CreativeTableView } from "@/app/test/creative-table-view"
-import { CreativeDetailView } from "@/app/test/creative-detail-view"
+import { CreativeEditForm } from "@/app/test/creative-edit-form"
+import { AssignCampaignDialog } from "@/app/test/assign-campaign-dialog"
 import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
 import { LayoutGrid, List, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+import { trpc } from "../_trpc/client"
 
 export function CreativeLibrary({
   creatives,
   campaigns,
+  onActionSuccess
 }: {
   creatives: CreativeList
   campaigns: CampaignList
+  onActionSuccess: () => void
 }) {
   const [view, setView] = useState<"gallery" | "table">("gallery")
   const [searchTerm, setSearchTerm] = useState("")
   const [campaignFilter, setCampaignFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [selectedCreative, setSelectedCreative] = useState<CreativeObj | null>(null)
+  const [editCreative, setEditCreative] = useState<CreativeObj | null>(null)
+  const [assignCreative, setAssignCreative] = useState<CreativeObj | null>(null)
+  const [deleteCreative, setDeleteCreative] = useState<CreativeObj | null>(null)
 
   const filteredCreatives = useMemo(() => {
     return creatives.filter((creative) => {
@@ -52,8 +62,26 @@ export function CreativeLibrary({
 
 
 
-  const handleViewDetails = (creative: CreativeObj) => {
-    setSelectedCreative(creative)
+  const handleEdit = (creative: CreativeObj) => {
+    setEditCreative(creative)
+  }
+
+  const handleEditSuccess = () => {
+    setEditCreative(null)
+    onActionSuccess() 
+  }
+
+  const handleDelete = (creative: CreativeObj) => {
+    setDeleteCreative(creative)
+  }
+
+  const { mutateAsync: del } = trpc.creative.delete.useMutation()
+
+  const handleConfirmDelete = async () => {
+    if(deleteCreative) {
+      const data = await del({id: deleteCreative.id});
+      console.log(data)
+    }
   }
 
   const resetFilters = () => {
@@ -81,9 +109,9 @@ export function CreativeLibrary({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Campaigns</SelectItem>
-                {(campaigns).map((c) => (
-                  <SelectItem key={c?.id} value={c?.id || "-"}>
-                    {c?.name}
+                {(campaigns ?? []).map((c) => (
+                  <SelectItem key={c.id} value={c.id || "-"}>
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -131,24 +159,69 @@ export function CreativeLibrary({
 
       <div>
         {view === "gallery" ? (
-          <CreativeGalleryView creatives={filteredCreatives} onViewDetails={handleViewDetails} />
+          <CreativeGalleryView 
+            creatives={filteredCreatives} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete}
+            onAddToCampaign={setAssignCreative}
+            />
         ) : (
-          <CreativeTableView creatives={filteredCreatives} onViewDetails={handleViewDetails} />
+          <CreativeTableView 
+            creatives={filteredCreatives} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete}
+            onAddToCampaign={setAssignCreative}
+            /> 
         )}
       </div>
 
-      <Dialog open={!!selectedCreative} onOpenChange={(isOpen) => !isOpen && setSelectedCreative(null)}>
+      <Dialog open={!!editCreative} onOpenChange={(isOpen) => !isOpen && setEditCreative(null)}>
         <DialogContent className="max-w-4xl">
-          {selectedCreative && (
+          {editCreative && (
             <>
               <DialogHeader>
-                <DialogTitle>{selectedCreative.name}</DialogTitle>
+                <DialogTitle>{editCreative.name}</DialogTitle>
               </DialogHeader>
-              <CreativeDetailView creative={selectedCreative} />
+              <CreativeEditForm creative={editCreative} onSuccess={handleEditSuccess}/>
             </>
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteCreative} onOpenChange={(isOpen) => !isOpen && setDeleteCreative(null)}>
+        <AlertDialogContent>
+          {deleteCreative && (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the creative "{deleteCreative?.name}".
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmDelete}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={!!assignCreative} onOpenChange={(isOpen) => !isOpen && setAssignCreative(null)}>
+        <DialogContent className="max-w-4xl">
+          {assignCreative && (
+            <AssignCampaignDialog 
+              creative={assignCreative} 
+              onOpenChange={() => setAssignCreative(null)}
+              onSuccess={() => {
+                setAssignCreative(null)
+                onActionSuccess()
+              }}
+              /> 
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }
