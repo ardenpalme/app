@@ -2,6 +2,8 @@
 
 import type React from "react"
 
+
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
@@ -32,19 +34,24 @@ export function CreativeEditForm({
   creative: CreativeObj
   onSuccess: () => void
 }) {
+
   const form = useForm<CreativeEditFormValues>({
     resolver: zodResolver(CreativeEditSchema),
     defaultValues: {
+      id: creative.id,
       name: creative.name,
       notes: creative.notes || "",
       tags: creative.tags ?? [],
     },
-  })
+  });
+
+  const [rawTagsInput, setRawTagsInput] = useState<string>(creative.tags?.join(", "));
 
   const { mutateAsync : updateCreative, isPending : isUpdatingCreative} = trpc.creative.update.useMutation();
 
   const onSubmit = async(data: CreativeEditFormValues) => {
     try {
+      console.log("submitted form")
       const res = await updateCreative(data);
       console.log(res)
       toast.success("Creative has been resubmitted for review.")
@@ -58,14 +65,23 @@ export function CreativeEditForm({
     }
   }
 
+  const {data: submitter} = trpc.clerk.getUserName.useQuery(creative.submittedBy);
+
+  const parseTagsArray = (rawInput : string) : string[] => {
+    return rawInput
+    .split(',')
+    .map(tag => tag.trim())
+    .filter(Boolean);
+  }
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2 max-h-[70vh]">
       <div className="space-y-4">
-        <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted">
+        <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
           <img
-            src={creative.fileUrl || "/placeholder.svg"}
+            src={creative.fileUrl ? `/api/r2/${creative.fileUrl}` : "/placeholder.svg"}
             alt={creative.name}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-cover"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -87,13 +103,13 @@ export function CreativeEditForm({
         <DetailItem label="Status" value={<CreativeStatusBadge status={creative.approvalStatus} />} />
         <DetailItem
           label="Submitted"
-          value={`${creative.submittedBy || "-"} on ${
+          value={`${submitter?.name|| "-"} on ${
             creative.submissionDate ? formatDisplayDate(creative.submissionDate, "PPP") : "-"
           }`}
         />
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, (errors) => { console.log("FORM VALIDATION FAILED", errors); })} className="space-y-6">
           <FormField
             control={form.control}
             name="name"
@@ -114,7 +130,7 @@ export function CreativeEditForm({
               <FormItem>
                 <FormLabel>Notes</FormLabel>
                 <FormControl>
-                  <Textarea className="min-h-[100px]" {...field} value={field.value ?? ""}/>
+                  <Textarea className="h-40 min-h-[100px] max-h-60" {...field} value={field.value ?? ""}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,15 +144,12 @@ export function CreativeEditForm({
                 <FormLabel>Tags</FormLabel>
                 <FormControl>
                  <Input
-                    value={field.value?.join(", ") ?? ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(
-                        value
-                          .split(",")
-                          .map(tag => tag.trim())
-                          .filter(Boolean)
-                      );
+                    value={rawTagsInput}
+                    placeholder="Tag Creatives"
+                    onChange={(e) =>  setRawTagsInput(e.target.value) }
+                    onBlur={() => {
+                      const parsed = parseTagsArray(rawTagsInput);
+                      field.onChange(parsed);
                     }}
                   />
                 </FormControl>
@@ -146,7 +159,7 @@ export function CreativeEditForm({
             )}
           />
           <div className="flex justify-end">
-            <Button type="submit" disabled={isUpdatingCreative}>
+            <Button type="submit" onClick={() => {console.log("clicked")}} disabled={isUpdatingCreative}>
               {isUpdatingCreative && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
             </Button>

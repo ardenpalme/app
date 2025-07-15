@@ -76,10 +76,7 @@ export const CreativeEditSchema = z.object({
   name: z.string(),
   notes: z.string().nullable(),
   tags: z.array(z.string()),
-  proofOfPlay: z.boolean(),
-
-  submittedBy: z.string(),
-  submissionDate: z.date(),
+  //upadted by is set by prisma - NOTE
 });
 
 

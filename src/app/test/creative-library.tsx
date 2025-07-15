@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -23,6 +24,7 @@ import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
 import { LayoutGrid, List, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { trpc } from "../_trpc/client"
+import { deleteFileFromWorker } from "@/lib/r2-worker"
 
 export function CreativeLibrary({
   creatives,
@@ -71,7 +73,8 @@ export function CreativeLibrary({
     onActionSuccess() 
   }
 
-  const handleDelete = (creative: CreativeObj) => {
+  const handleDelete = async (creative: CreativeObj) => {
+    await deleteFileFromWorker(creative.fileUrl);
     setDeleteCreative(creative)
   }
 
@@ -157,23 +160,23 @@ export function CreativeLibrary({
 
       <Separator />
 
-      <div>
-        {view === "gallery" ? (
-          <CreativeGalleryView 
-            creatives={filteredCreatives} 
-            onEdit={handleEdit} 
-            onDelete={handleDelete}
-            onAddToCampaign={setAssignCreative}
-            />
-        ) : (
-          <CreativeTableView 
-            creatives={filteredCreatives} 
-            onEdit={handleEdit} 
-            onDelete={handleDelete}
-            onAddToCampaign={setAssignCreative}
-            /> 
-        )}
-      </div>
+      <ScrollArea className="h-full">
+      {view === "gallery" ? (
+        <CreativeGalleryView 
+          creatives={filteredCreatives} 
+          onEdit={handleEdit} 
+          onDelete={handleDelete}
+          onAddToCampaign={setAssignCreative}
+          />
+      ) : (
+        <CreativeTableView 
+          creatives={filteredCreatives} 
+          onEdit={handleEdit} 
+          onDelete={handleDelete}
+          onAddToCampaign={setAssignCreative}
+          /> 
+      )}
+      </ScrollArea>
 
       <Dialog open={!!editCreative} onOpenChange={(isOpen) => !isOpen && setEditCreative(null)}>
         <DialogContent className="max-w-4xl">

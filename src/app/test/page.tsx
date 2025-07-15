@@ -39,7 +39,7 @@ export default function CreativesPage() {
           Upload Creative
         </Button>
       </div>
-      <CreativeLibrary creatives={allCreatives} campaigns={campaignsForFilter} />
+      <CreativeLibrary creatives={allCreatives} campaigns={campaignsForFilter} onActionSuccess={() => {refetch()}}/>
       <AddAssetDialog
         open={isUploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
