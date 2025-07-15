@@ -211,7 +211,7 @@ export const campaignRouter = router({
   listAll : publicProcedure
     .output(campaignSchema)
     .query(async () => {
-      const data = db.campaign.findMany({
+      const data = await db.campaign.findMany({
         select : {
           id: true,
           name: true,
