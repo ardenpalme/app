@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { downloadFileFromWorker } from "@/lib/r2-worker"
 
-export async function GET(request: NextRequest, context: { params: { slug: string[] } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { slug: string[] } }
+) {
   try {
-    const { params } = context;
-    const filename = params.slug.join("/");
+    const { slug } = await params
+    const filename = slug.join("/");
     if (!filename) {
       return new NextResponse("Filename is required", { status: 400 })
     }

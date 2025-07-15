@@ -43,3 +43,20 @@ export const downloadFileFromWorker = async (fname: string): Promise<Blob> => {
   return res.blob()
 }
 
+/**
+ * Deletes a file from the Cloudflare R2 worker.
+ * @param fname The unique filename (stored as fileUrl in the database).
+ * @returns A Promise that resolves when the deletion is complete.
+ */
+export const deleteFileFromWorker = async (fname: string): Promise<void> => {
+  const res = await fetch(`${R2_WORKER_URL}/${fname}`, {
+    method: "DELETE",
+    headers: {
+      "x-custom-psk": R2_PSK,
+    },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Delete failed: ${res.status} - ${text}`)
+  }
+}
