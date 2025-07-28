@@ -10,24 +10,25 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectLabel, SelectGroup, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import { trpc } from "@/app/_trpc/client"
 import type { CreativeObj } from "@/schemas/assets"
 import { toast } from "sonner"
 import { CreativeUpdateCampaignSchema } from "@/schemas/assets"
-import { CreateCampaignDialog } from "./create-campaign-dialog"
 
 export function AssignCampaignDialog({
   creative,
   onOpenChange,
   onSuccess,
+  onCreateCamp,
 }: {
-  creative: CreativeObj
+  creative: CreativeObj | null
   onOpenChange: (open: boolean) => void
   onSuccess: () => void
+  onCreateCamp: () => void
 }) {
-  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null | undefined>(creative.campaignId)
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null | undefined>(creative?.campaignId)
   const { data: campaigns, isLoading: isLoadingCampaigns } = trpc.campaign.listAll.useQuery()
   const { mutateAsync: assocWithCampaign, isPending } = trpc.creative.assignCampaign.useMutation();
 
@@ -56,7 +57,9 @@ export function AssignCampaignDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Assign to Campaign</DialogTitle>
-          <DialogDescription>Assign the creative "{creative?.name}" to an existing campaign.</DialogDescription>
+          <DialogDescription>
+            Assign the creative "{creative?.name}" to an existing campaign. 
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           {isLoadingCampaigns ? (
@@ -72,11 +75,13 @@ export function AssignCampaignDialog({
                 <SelectValue placeholder="Select a campaign" />
               </SelectTrigger>
               <SelectContent>
-              {(campaigns ?? []).map((campaign) => (
-                <SelectItem key={campaign.id} value={campaign.id}>
-                  {campaign.name}
-                </SelectItem>
-              ))}
+                <SelectGroup>
+                {(campaigns ?? []).map((campaign) => (
+                  <SelectItem key={campaign.id} value={campaign.id}>
+                    {campaign.name}
+                  </SelectItem>
+                ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           )}

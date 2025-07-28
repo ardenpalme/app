@@ -4,7 +4,7 @@ import { useState } from "react"
 import { trpc } from "@/app/_trpc/client"
 import { Loader2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { AddAssetDialog } from "./add-assets-dialog"
+import { AddAssetDialog } from "@/app/_components/add-assets-dialog"
 import { CreativeLibrary } from "./creative-library"
 
 export default function CreativesPage() {

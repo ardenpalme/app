@@ -6,7 +6,9 @@ import {
   creativeSchema,
   CreativeEditSchema,
   creativeUpdateCampaignSchema,
-  NewCampaignFormSchema
+  uploadcampaignSchema,
+  uploadcampaignSchemaList,
+  newCampaignFormSchema,
 } from '@/schemas/assets';
 import { db } from '../db'
 import {z} from 'zod'
@@ -223,11 +225,48 @@ export const campaignRouter = router({
     }),
 
     add: publicProcedure
-      .input(NewCampaignFormSchema)
-      .mutation(async ({input}) => {
-        const res = await db.campaign.create({ data : input });
-        console.log(res);
-    }),
+      .input(newCampaignFormSchema)
+      .mutation(async ({ input }) => {
+        try {
+          const res = await db.campaign.create({
+            data: {
+              name: input.name,
+              startDate: input.startDate,
+              endDate: input.endDate,
+              notes: input.notes,
+              userId: input.userId,
+              orgId: input.orgId,
+              submittedBy: input.submittedBy,
+              submissionDate: input.submissionDate,
+            },
+          });
 
+          return res; // ✅ must return result to avoid 500
+        } catch (err) {
+          console.error("❌ Campaign creation failed", err); // ✅ visible logs
+          throw new Error("Internal Server Error");
+        }
+      }),
+
+    listComplete: publicProcedure
+      .output(uploadcampaignSchemaList)
+      .query(async () => {
+        const data = await db.campaign.findMany({
+          select: {
+            id: true,
+            name: true,
+            startDate: true,
+            endDate: true,
+            notes: true,
+            userId: true,
+            orgId: true,
+            status: true,
+            submittedBy: true,
+            submissionDate: true,
+          },
+        });
+
+        return data;
+      }),
 
 });

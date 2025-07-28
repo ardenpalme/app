@@ -8,8 +8,7 @@ datasource db {
 }
 
 enum CampaignStatus {
-  draft
-  WAITING_FOR_APPROVAL
+  PENDING
   APPROVED
   REJECTED
 }
@@ -26,7 +25,7 @@ model Campaign {
   name           String
   startDate      DateTime
   endDate        DateTime
-  status         CampaignStatus @default(draft)
+  status         CampaignStatus @default(PENDING)
   notes          String?
   userId         String
   orgId          String

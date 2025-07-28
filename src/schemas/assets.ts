@@ -20,6 +20,7 @@ export const creativeFormSchema = z.object({
   submittedBy: z.string(),
   submissionDate: z.date(),
 });
+export type CreativeForm = z.infer<typeof creativeFormSchema>
 
 export const creativeSchema = z.object({
   id: z.string(),
@@ -45,8 +46,13 @@ export const creativeSchema = z.object({
   submittedBy: z.string(),
   submissionDate: z.date(),
 });
+export type CreativeObj = z.infer<typeof creativeSchema>
+
+export const creativeListSchema = z.array(creativeSchema);
+export type CreativeList = z.infer<typeof creativeListSchema>
 
 export const unassignedCreativeListSchema = z.array(creativeSchema);
+export type unassignedCreativeList = z.infer<typeof unassignedCreativeListSchema>
 
 export const campaignSchema = z.array(z.object({
   id: z.string(),
@@ -54,22 +60,15 @@ export const campaignSchema = z.array(z.object({
 }))
 .optional()
 .nullable(); // TODO check listForSelect
+export type CampaignList = z.infer<typeof campaignSchema>
 
-export const creativeListSchema = z.array(creativeSchema);
 
 export const mediaMetadataSchema = z.object({
   width: z.number().optional(),
   height: z.number().optional(),
   duration: z.number().optional(),
 })
-
-export type CreativeForm = z.infer<typeof creativeFormSchema>
 export type MediaMetadata = z.infer<typeof mediaMetadataSchema>
-export type CreativeList = z.infer<typeof creativeListSchema>
-export type unassignedCreativeList = z.infer<typeof unassignedCreativeListSchema>
-
-export type CreativeObj = z.infer<typeof creativeSchema>
-export type CampaignList = z.infer<typeof campaignSchema>
 
 export const CreativeEditSchema = z.object({
   id: z.string(),
@@ -86,14 +85,41 @@ export const creativeUpdateCampaignSchema = z.object({
 });
 export type CreativeUpdateCampaignSchema = z.infer<typeof creativeUpdateCampaignSchema>
 
-export const NewCampaignFormSchema = z.object({
-  id: z.string(),
+
+export const newCampaignFormSchema = z.object({
   name: z.string(),
   startDate: z.date(),
   endDate: z.date(),
-  notes: z.string(),
+  notes: z.string().nullable(),
   userId: z.string(),
   orgId: z.string(),
   submittedBy: z.string(),
   submissionDate: z.date(),
-})
+});
+
+export type NewCampaignFormSchema = z.infer<typeof newCampaignFormSchema>
+
+export const uploadcampaignSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+  notes: z.string().nullable(), 
+  userId: z.string(),
+  orgId: z.string(),
+  status: z.enum(CampaignStatus),
+
+  creatives: z.array(creativeSchema).optional().nullable(),
+
+  submittedBy: z.string().nullable(),
+  submissionDate: z.date().nullable(),
+});
+export type UploadCampaignSchema = z.infer<typeof uploadcampaignSchema>
+
+export const uploadcampaignSchemaList = z.array(uploadcampaignSchema)
+export type UploadCampaignSchemaList = z.infer<typeof uploadcampaignSchemaList>
+
+export type CampaignObj = z.infer<typeof uploadcampaignSchema>
+
+
+

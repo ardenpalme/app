@@ -1,17 +1,12 @@
 import { Badge } from "@/components/ui/badge"
 import type { CampaignStatus, CreativeApprovalStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
-import { ThumbsUp, ThumbsDown, CircleDot, FileEdit, XCircle, CheckCircle, Clock } from "lucide-react"
+import { ThumbsUp, ThumbsDown, CircleDot, XCircle, CheckCircle, Clock } from "lucide-react"
 
 export const CampaignStatusBadge = ({ status }: { status: CampaignStatus }) => {
   const statusConfig = {
-    "draft": {
-      label: "draft",
-      icon: <FileEdit className="h-3 w-3" />,
-      className: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    },
-    "WAITING_FOR_APPROVAL": {
-      label: "Waiting for Approval",
+    "PENDING": {
+      label: "PENDING",
       icon: <Clock className="h-3 w-3" />,
       className:
         "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-800",

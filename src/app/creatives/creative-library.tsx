@@ -16,15 +16,16 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CreativeGalleryView } from "@/app/test/creative-gallery-view"
-import { CreativeTableView } from "@/app/test/creative-table-view"
-import { CreativeEditForm } from "@/app/test/creative-edit-form"
-import { AssignCampaignDialog } from "@/app/test/assign-campaign-dialog"
+import { CreativeGalleryView } from "./creative-gallery-view"
+import { CreativeTableView } from "./creative-table-view"
+import { CreativeEditForm } from "@/app/_components/creative-edit-form"
+import { AssignCampaignDialog } from "@/app/_components/assign-campaign-dialog"
 import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
 import { LayoutGrid, List, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { trpc } from "../_trpc/client"
 import { deleteFileFromWorker } from "@/lib/r2-worker"
+import { CreateCampaignDialog } from "@/app/_components/create-campaign-dialog"
 
 export function CreativeLibrary({
   creatives,
@@ -42,6 +43,7 @@ export function CreativeLibrary({
   const [editCreative, setEditCreative] = useState<CreativeObj | null>(null)
   const [assignCreative, setAssignCreative] = useState<CreativeObj | null>(null)
   const [deleteCreative, setDeleteCreative] = useState<CreativeObj | null>(null)
+  const [createNewCamp, setCreateNewCamp] = useState<boolean>(false)
 
   const filteredCreatives = useMemo(() => {
     return creatives.filter((creative) => {
@@ -210,20 +212,19 @@ export function CreativeLibrary({
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!assignCreative} onOpenChange={(isOpen) => !isOpen && setAssignCreative(null)}>
-        <DialogContent className="max-w-4xl">
-          {assignCreative && (
-            <AssignCampaignDialog 
-              creative={assignCreative} 
-              onOpenChange={() => setAssignCreative(null)}
-              onSuccess={() => {
-                setAssignCreative(null)
-                onActionSuccess()
-              }}
-              /> 
-          )}
-        </DialogContent>
-      </Dialog>
+      <AssignCampaignDialog 
+        creative={assignCreative} 
+        onOpenChange={() => setAssignCreative(null)}
+        onSuccess={() => {
+          setAssignCreative(null)
+          onActionSuccess()
+        }}
+        onCreateCamp={()=>{
+          console.log("ICI PUTAIN FAIT CHIER")
+          setCreateNewCamp(true)
+          setAssignCreative(null)
+        }}
+        /> 
 
     </div>
   )

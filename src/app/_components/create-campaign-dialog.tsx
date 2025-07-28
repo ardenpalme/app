@@ -16,14 +16,10 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import { trpc } from "@/app/_trpc/client"
-import { NewCampaignFormSchema } from "@/schemas/assets"
+import { newCampaignFormSchema, NewCampaignFormSchema } from "@/schemas/assets"
 import { DatePicker } from "@/components/ui/date-picker"
-import { add } from "date-fns"
-
-type NewCampaignFormValues = z.infer<typeof NewCampaignFormSchema>
 
 
 export function CreateCampaignDialog({ 
@@ -36,13 +32,14 @@ export function CreateCampaignDialog({
   onSuccess: () => void
 }) {
 
-  const { user } = useUser()
-  const organization = user ? `${user?.organizationMemberships[0]}` : "";
+  const { mutateAsync: addCampaign, isPending: isAddCampaignPending } = trpc.campaign.add.useMutation()
 
-  const form = useForm<NewCampaignFormValues>({
-    resolver: zodResolver(NewCampaignFormSchema),
+  const { user } = useUser()
+  const organization = "test" //user ? `${user?.organizationMemberships[0]}` : "";
+
+  const form = useForm<NewCampaignFormSchema>({
+    resolver: zodResolver(newCampaignFormSchema),
     defaultValues: {
-      id: "",
       name: "",
       startDate: new Date(),
       endDate: new Date(),
@@ -54,11 +51,11 @@ export function CreateCampaignDialog({
     },
   })
 
-  const { mutateAsync: addCampaign, isPending: isAddCampaignPending } = trpc.campaign.add.useMutation()
 
-  const createCampaign = async (data : NewCampaignFormValues) => {
+  const createCampaign = async (data : NewCampaignFormSchema) => {
     try {
-      addCampaign(data);
+      console.log(data)
+      await addCampaign(data);
       form.reset()
       onSuccess()
 
@@ -73,7 +70,7 @@ export function CreateCampaignDialog({
     }
   }
 
-  function onSubmit(data: NewCampaignFormValues) {
+  function onSubmit(data: NewCampaignFormSchema) {
     if(data.endDate < data.startDate) {
       toast.error("Invalid Date Range")
     }else {
@@ -97,7 +94,7 @@ export function CreateCampaignDialog({
                 <FormItem>
                   <FormLabel>Campaign Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Summer 2024 Launch" {...field} />
+                    <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
