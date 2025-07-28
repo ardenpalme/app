@@ -7,45 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CampaignStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum CreativeApprovalStatus {
+enum ApprovalStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
 
-model Campaign {
-  id             String         @id @default(cuid())
-  name           String
-  startDate      DateTime
-  endDate        DateTime
-  status         CampaignStatus @default(PENDING)
-  notes          String?
-  userId         String
-  orgId          String
-  creatives      Creative[]
-
-  submittedBy    String?
-  submissionDate DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  @@index([orgId])
-}
-
-model Creative {
+model Media {
   id                 String                 @id @default(cuid())
   name               String
   notes              String?
   tags               String[]               @default([])
-  approvalStatus     CreativeApprovalStatus @default(PENDING)
-  proofOfPlay        Boolean                @default(false)
+  approvalStatus     ApprovalStatus         @default(PENDING)
   orgId              String
 
   // R2 Storage Metadata
@@ -56,11 +30,11 @@ model Creative {
 
   // Media Metadata
   width              Int?
-  height              Int?
+  height             Int?
   duration           Float?
 
-  campaign           Campaign?              @relation(fields: [campaignId], references: [id], onDelete: SetNull)
-  campaignId         String?
+  playlist           Playlist?              @relation(fields: [playlistId], references: [id], onDelete: SetNull)
+  playlistId         PlaylistId?
 
   submittedBy        String
   submissionDate     DateTime
@@ -68,4 +42,8 @@ model Creative {
   updatedAt          DateTime               @updatedAt
 
   @@index([orgId])
+}
+
+model Playlist {
+  id                 String                 @id @default(cuid())
 }
