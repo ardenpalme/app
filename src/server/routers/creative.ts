@@ -57,6 +57,18 @@ export const creativeRouter = router({
       return data;
     }),
 
+  listById : publicProcedure
+    .input(z.string())
+    .output(creativeSchema.nullable())
+    .query(async ({input}) => {
+      const data = await db.creative.findUnique({
+        where: {
+          id: input
+        }
+      });
+      return data;
+    }),
+
   update : publicProcedure
     .input(CreativeEditSchema)
     .mutation(async ({input}) => {

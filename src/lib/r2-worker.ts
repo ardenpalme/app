@@ -21,7 +21,10 @@ export const uploadFileToWorker = async (file: File, fname: string, signal: Abor
   if (!res.ok) {
     const text = await res.text()
     throw new Error(`Upload failed: ${res.status} - ${text}`)
+    // TODO failsafe return?
   }
+  const json = await res.json();
+  return json; 
 }
 
 /**
