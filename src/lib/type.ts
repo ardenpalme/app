@@ -15,3 +15,12 @@ export interface LayoutEditorProps {
   uploadAsset: (localFile : File) => Promise<void>;
   deleteAsset: (fileId : string) => Promise<void>;
 }
+
+export interface AssetsPanelProps {
+  store: StoreType;
+  creatives: CreativeList;
+  onRefresh : () => Promise<void>;
+  uploadAsset: (localFile : File) => Promise<void>;
+  deleteAsset: (fileId : string) => Promise<void>;
+}
+

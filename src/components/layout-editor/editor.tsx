@@ -1,16 +1,16 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
 import { Toolbar } from 'polotno/toolbar/toolbar';
 import { PagesTimeline } from 'polotno/pages-timeline';
 import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
-import { SidePanel } from 'polotno/side-panel';
+import { BackgroundSection, ElementsSection, Section, SectionTab, SidePanel, TemplatesSection, TextSection } from 'polotno/side-panel';
 import { Workspace } from 'polotno/canvas/workspace';
 import { createStore } from 'polotno/model/store';
-import { DEFAULT_SECTIONS } from 'polotno/side-panel';
-import { UploadPanel } from './upload-panel';
 import { LayoutEditorProps } from '@/lib/type';
+import { MediaSection, PhotosPanel } from './assets-panel';
+import { BookText } from 'lucide-react';
 
 const store = createStore({
   key: 'iBbDdFxct_0aplfGoI8Q', // you can create it here: https://polotno.com/cabinet/
@@ -22,25 +22,46 @@ const store = createStore({
 const page = store.addPage();
 
 export default function LayoutEditor ({creatives, onRefresh, uploadAsset, deleteAsset} : LayoutEditorProps) {
-  // find default upload section
-  const UploadSection = DEFAULT_SECTIONS.find(
-    (section) => section.name === 'upload'
-  );
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selected = store.selectedElements;
+        if (selected.length) {
+          store.deleteElements(selected.map((elem) => elem.id));
+        }
+      }
+    };
 
-  // overwrite its panel component
-  if (UploadSection) { // TODO if its not defined?
-    UploadSection.Panel = () => {
-      return (
-        <UploadPanel 
-          store={store}
-          creatives={creatives}
-          onRefresh={onRefresh}
-          uploadAsset={uploadAsset}
-          deleteAsset={deleteAsset}
-          />
-      );
-    }
-  }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [store]);
+
+// define the new custom section
+const MediaSection = {
+  name: 'media',
+  Tab: (props) => (
+    <SectionTab {...props} name="Media">
+      <div className='w-full h-full flex items-center justify-center'>
+        <BookText className='w-5 h-5'/>
+      </div>
+    </SectionTab>
+  ),
+  // we need observer to update component automatically on any store changes
+  Panel: (() => {
+    return (
+      <PhotosPanel
+        store={store}
+        creatives={creatives}
+        onRefresh={onRefresh}
+        uploadAsset={uploadAsset}
+        deleteAsset={deleteAsset}
+        />
+    );
+  }),
+} as Section; 
+
+  const sections: Section[] = [TemplatesSection, MediaSection, TextSection, ElementsSection, BackgroundSection];
 
   return (
     <PolotnoContainer style={{ width: '100vw', height: '100vh' }}>
@@ -51,12 +72,12 @@ export default function LayoutEditor ({creatives, onRefresh, uploadAsset, delete
       <SidePanelWrap>
         <SidePanel 
           store={store} 
-          sections={DEFAULT_SECTIONS}
-          defaultSection="upload"
+          sections={sections}
+          defaultSection="media"
           />
       </SidePanelWrap>
       <WorkspaceWrap>
-        <Toolbar store={store} downloadButtonEnabled />
+        <Toolbar store={store} />
         <Workspace store={store} />
         <ZoomButtons store={store} />
         <PagesTimeline store={store} />
