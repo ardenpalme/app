@@ -9,6 +9,8 @@ import {
   uploadcampaignSchema,
   uploadcampaignSchemaList,
   newCampaignFormSchema,
+  rssObjSchema,
+  rssObjSchemaList,
 } from '@/schemas/assets';
 import { db } from '../db'
 import {z} from 'zod'
@@ -282,3 +284,37 @@ export const campaignRouter = router({
       }),
 
 });
+
+export const rssRouter = router({
+  listAll : publicProcedure
+    .output(rssObjSchemaList)
+    .query(async () => {
+      const data = await db.rss_files.findMany({
+        select: {
+          id: true,
+          tags: true,
+          name: true,
+          url: true,
+          orgId: true,
+        }
+      });
+
+      return data;
+    }),
+
+  add : publicProcedure
+    .input(rssObjSchema)
+    .mutation(async ({input}) => {
+      const res = db.rss_files.create({
+        data: {
+          id: input.id,
+          name: input.name,
+          tags: input.tags,
+          url: input.url,
+          orgId: input.orgId,
+        }
+      });
+      return res;
+    }),
+});
+

@@ -49,6 +49,7 @@ export const getMediaMetadata = async (file: File): Promise<MediaMetadata> => {
   })
 }
 
+// TODO test video upload
 export const getVideoThumbnail = (file: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
@@ -88,4 +89,3 @@ export const getVideoThumbnail = (file: File): Promise<File> => {
     };
   });
 };
-

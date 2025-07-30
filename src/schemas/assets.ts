@@ -121,5 +121,28 @@ export type UploadCampaignSchemaList = z.infer<typeof uploadcampaignSchemaList>
 
 export type CampaignObj = z.infer<typeof uploadcampaignSchema>
 
+export const rssObjSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tags: z.array(z.string()),
+  url: z.string(),
+  orgId: z.string(),
+})
+
+export const rssObjSchemaList = z.array(rssObjSchema)
+export type rssObjList = z.infer<typeof rssObjSchemaList>
+export type rssObj = z.infer<typeof rssObjSchema>
 
 
+export const rssObjRenderSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  fileUrl: z.string(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  sourceUrl: z.string(),
+})
+type rssObjRender = z.infer<typeof rssObjRenderSchema>
+
+export const rssObjRenderSchemaList = z.array(rssObjRenderSchema)
+export type rssObjRenderList = z.infer<typeof rssObjRenderSchemaList>

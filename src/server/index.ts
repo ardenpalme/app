@@ -1,6 +1,6 @@
 import { router } from './trpc';
 import { testRouter} from './routers/test'
-import { campaignRouter, creativeRouter } from './routers/creative'
+import { campaignRouter, creativeRouter, rssRouter } from './routers/creative'
 import { clerkRouter } from './routers/clerk';
 
 export const appRouter = router({
@@ -8,6 +8,7 @@ export const appRouter = router({
   creative: creativeRouter,
   campaign: campaignRouter,
   clerk: clerkRouter,
+  rss: rssRouter,
 });
 
 // export type definition of API

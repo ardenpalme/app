@@ -17,15 +17,17 @@ export default function LayoutEditorPage() {
   const { data: allAssets, isLoading: isLoadingAssets, refetch : refetchAssets } = trpc.creative.listAll.useQuery()
   const { mutateAsync: uploadCreative } = trpc.creative.add.useMutation()
   const { mutateAsync: deleteCreative } = trpc.creative.delete.useMutation()
+  const { mutateAsync: uploadRSSResource } = trpc.rss.add.useMutation()
+  const { data: allRSS } = trpc.rss.listAll.useQuery()
+
   const { user } = useUser()
   const organization = user?.organizationMemberships[0];
 
   const uploadAsset = async (file : File) => {
-
     const fileName = file.name;
     const metadata = await getMediaMetadata(file)
     if (file.type.startsWith("video/")) {
-      //store a thumbnail
+      //store a thumbnail -- TODO TEST VIDEO UPLOAD
       const thumbnail_name = `{file.name}_thumbnail`;
       const thumbnail_file = await getVideoThumbnail(file)
       await uploadFileToWorker(thumbnail_file, thumbnail_name, new AbortController().signal);
@@ -69,12 +71,26 @@ export default function LayoutEditorPage() {
     await deleteCreative({ id: assetId })
   }
 
+  const uploadRSS = async (rssUrl: string) => {
+    const in_rss = {
+      id: cuid(),
+      name: "",
+      tags: [],
+      url: rssUrl,
+      orgId: "",
+    }
+    console.log(in_rss);
+    await uploadRSSResource(in_rss);
+  }
+
   return (
     <LayoutEditor
       creatives={allAssets ?? []}
+      rssObjs={allRSS ?? []}
       onRefresh={async () => {await refetchAssets()}}
       uploadAsset={uploadAsset}
       deleteAsset={deleteAsset}
+      uploadRSS={uploadRSS}
     />
   );
 }

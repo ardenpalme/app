@@ -9,8 +9,9 @@ import { BackgroundSection, ElementsSection, Section, SectionTab, SidePanel, Tem
 import { Workspace } from 'polotno/canvas/workspace';
 import { createStore } from 'polotno/model/store';
 import { LayoutEditorProps } from '@/lib/type';
-import { MediaSection, PhotosPanel } from './assets-panel';
-import { BookText } from 'lucide-react';
+import { MediaPanel} from './media-panel';
+import { BookText, LayoutTemplate, Rss, RssIcon } from 'lucide-react';
+import { RSSPanel } from './rss-panel';
 
 const store = createStore({
   key: 'iBbDdFxct_0aplfGoI8Q', // you can create it here: https://polotno.com/cabinet/
@@ -20,9 +21,12 @@ const store = createStore({
 });
 
 const page = store.addPage();
+page.set({
+  height: 1920,
+  width: 1080,
+});
 
-export default function LayoutEditor ({creatives, onRefresh, uploadAsset, deleteAsset} : LayoutEditorProps) {
-  
+export default function LayoutEditor ({creatives, rssObjs, onRefresh, uploadAsset, deleteAsset, uploadRSS} : LayoutEditorProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -37,34 +41,56 @@ export default function LayoutEditor ({creatives, onRefresh, uploadAsset, delete
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [store]);
 
-// define the new custom section
-const MediaSection = {
-  name: 'media',
-  Tab: (props) => (
-    <SectionTab {...props} name="Media">
-      <div className='w-full h-full flex items-center justify-center'>
-        <BookText className='w-5 h-5'/>
-      </div>
-    </SectionTab>
-  ),
-  // we need observer to update component automatically on any store changes
-  Panel: (() => {
-    return (
-      <PhotosPanel
-        store={store}
-        creatives={creatives}
-        onRefresh={onRefresh}
-        uploadAsset={uploadAsset}
-        deleteAsset={deleteAsset}
-        />
-    );
-  }),
-} as Section; 
+  // define the new custom section
+  const MediaSection = {
+    name: 'media',
+    Tab: (props) => (
+      <SectionTab {...props} name="Media">
+        <div className='w-full h-full flex items-center justify-center'>
+          <BookText className='w-5 h-5'/>
+        </div>
+      </SectionTab>
+    ),
+    // we need observer to update component automatically on any store changes
+    Panel: (() => {
+      return (
+        <MediaPanel
+          store={store}
+          creatives={creatives}
+          onRefresh={onRefresh}
+          uploadAsset={uploadAsset}
+          deleteAsset={deleteAsset}
+          />
+      );
+    }),
+  } as Section; 
 
-  const sections: Section[] = [TemplatesSection, MediaSection, TextSection, ElementsSection, BackgroundSection];
+  // define the new custom section
+  const RSSSection = {
+    name: 'rss',
+    Tab: (props) => (
+      <SectionTab {...props} name="RSS">
+        <div className='w-full h-full flex items-center justify-center'>
+          <RssIcon className='w-5 h-5'/>
+        </div>
+      </SectionTab>
+    ),
+    // we need observer to update component automatically on any store changes
+    Panel: (() => {
+      return (
+        <RSSPanel
+          store={store}
+          rssObjs={rssObjs}
+          uploadRSS={uploadRSS}
+          />
+      );
+    }),
+  } as Section; 
+
+  const sections: Section[] = [MediaSection, RSSSection, TextSection, ElementsSection, BackgroundSection];
 
   return (
-    <PolotnoContainer style={{ width: '100vw', height: '100vh' }}>
+    <PolotnoContainer style={{ width: '100vw', height: '90vh', position: 'relative'}}>
       <link
         rel="stylesheet"
         href="https://unpkg.com/@blueprintjs/core@5/lib/css/blueprint.css"

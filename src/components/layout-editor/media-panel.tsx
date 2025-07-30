@@ -6,8 +6,9 @@ import React from 'react';
 import { AssetsPanelProps } from '@/lib/type';
 import { CreativeList } from "@/schemas/assets"
 import { getImageSize } from 'polotno/utils/image';
+import { nanoid } from 'nanoid';
 
-export const PhotosPanel = observer(({ store, creatives, onRefresh, deleteAsset, uploadAsset } : AssetsPanelProps) => {
+export const MediaPanel = observer(({ store, creatives, onRefresh, deleteAsset, uploadAsset } : AssetsPanelProps) => {
   const [assets, setAssets] = React.useState<CreativeList>(creatives);
 
   return (
@@ -28,6 +29,7 @@ export const PhotosPanel = observer(({ store, creatives, onRefresh, deleteAsset,
           //      page - page where user dropped the image
           const { width, height } = asset
           store.activePage.addElement({
+            id: nanoid(),
             type: 'image',
             src: `/api/r2/${asset.fileUrl}`,
             width,
