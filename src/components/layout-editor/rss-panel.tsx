@@ -23,7 +23,7 @@ export const RSSPanel = observer(({store, rssObjs, uploadRSS} : RSSPanelProps) =
       rssObjs.map(async (item) => {
         const res = await fetch(`/api/rss/${encodeURIComponent(item.url)}`);
         const data = await res.json();
-        console.log(data)
+        //console.log(data)
         const image = data.items?.[0];
         if (!image) return null;
 

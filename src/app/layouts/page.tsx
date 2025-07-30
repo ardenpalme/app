@@ -6,12 +6,11 @@ import dynamic from "next/dynamic";
 import { deleteFileFromWorker, uploadFileToWorker } from "@/lib/r2-worker";
 import { trpc } from "@/app/_trpc/client";
 import { getMediaMetadata, getVideoThumbnail } from "@/utils/helpers";
-import { creativeFormSchema } from "@/schemas/assets";
+import { creativeFormSchema, CreativeObj } from "@/schemas/assets";
 
 const LayoutEditor = dynamic(() => import("@/components/layout-editor/editor"), {
   ssr: false, // 🚨 CRITICAL
 });
-
 
 export default function LayoutEditorPage() {
   const { data: allAssets, isLoading: isLoadingAssets, refetch : refetchAssets } = trpc.creative.listAll.useQuery()
@@ -27,9 +26,11 @@ export default function LayoutEditorPage() {
     const fileName = file.name;
     const metadata = await getMediaMetadata(file)
     if (file.type.startsWith("video/")) {
-      //store a thumbnail -- TODO TEST VIDEO UPLOAD
-      const thumbnail_name = `{file.name}_thumbnail`;
+
+      const in_file = file.name
+      const thumbnail_name = in_file.replace(/(\.[^/.]+)$/, '_thumbnail.jpg');
       const thumbnail_file = await getVideoThumbnail(file)
+      console.log(thumbnail_name);
       await uploadFileToWorker(thumbnail_file, thumbnail_name, new AbortController().signal);
     }
 
@@ -57,18 +58,16 @@ export default function LayoutEditorPage() {
     await uploadCreative(in_creative);
   }
 
-  const deleteAsset = async (assetId: string) => {
-    const { data: asset } = trpc.creative.listById.useQuery(assetId)
-
+  const deleteAsset = async (asset : CreativeObj) => {
     if(asset) {
       const url = asset.fileUrl
       await deleteFileFromWorker(url);
       if (asset.fileType.startsWith("video/")) {
-        const thumbnailUrl = url.replace(/(\.[^/.]+)$/, '-thumbnail$1');
+        const thumbnailUrl = url.replace(/(\.[^/.]+)$/, '_thumbnail.jpg');
         await deleteFileFromWorker(thumbnailUrl);
       }
     }
-    await deleteCreative({ id: assetId })
+    await deleteCreative({ id: asset.id })
   }
 
   const uploadRSS = async (rssUrl: string) => {
