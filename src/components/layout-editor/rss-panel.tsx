@@ -23,8 +23,8 @@ export const RSSPanel = observer(({store, rssObjs, uploadRSS} : RSSPanelProps) =
       rssObjs.map(async (item) => {
         const res = await fetch(`/api/rss/${encodeURIComponent(item.url)}`);
         const data = await res.json();
-        //console.log(data)
-        const image = data.items?.[0];
+        console.log(data)
+        const image = data.items?.[4];
         if (!image) return null;
 
         return {
@@ -47,20 +47,19 @@ export const RSSPanel = observer(({store, rssObjs, uploadRSS} : RSSPanelProps) =
 
   return (
     <div className='flex flex-col h-full'>
-      <Input
-        value={rssUrl}
-        onChange={(e) => setRssUrl(e.target.value)}
-        placeholder='RSS URL'
-        />
-      <Button
-        variant="ghost"
-        onClick={() => uploadRSS(rssUrl)}
-      >
-        <div className='flex flex-col'>
-          <p>Upload</p>
-          <CloudIcon/>
-        </div>
-      </Button>
+      <div className='flex flex-row'>
+        <Input
+          value={rssUrl}
+          onChange={(e) => setRssUrl(e.target.value)}
+          placeholder='RSS URL'
+          />
+        <Button
+          variant="ghost"
+          onClick={() => uploadRSS(rssUrl)}
+        >
+          Save
+        </Button>
+      </div>
       {images.length > 0 && (
       <ImagesGrid
         images={images}

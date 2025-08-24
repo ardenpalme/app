@@ -1,0 +1,18 @@
+@font-face{
+  font-family: "blueprint-icons-16";
+  src: url("/blueprint/blueprint-icons-16.woff2") format("woff2"),
+       url("/blueprint/blueprint-icons-16.woff")  format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face{
+  font-family: "blueprint-icons-20";
+  src: url("/blueprint/blueprint-icons-20.woff2") format("woff2"),
+       url("/blueprint/blueprint-icons-20.woff")  format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+

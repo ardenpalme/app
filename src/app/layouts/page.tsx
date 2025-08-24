@@ -5,22 +5,59 @@ import { useUser } from "@clerk/nextjs"
 import dynamic from "next/dynamic";
 import { deleteFileFromWorker, uploadFileToWorker } from "@/lib/r2-worker";
 import { trpc } from "@/app/_trpc/client";
-import { getMediaMetadata, getVideoThumbnail } from "@/utils/helpers";
-import { creativeFormSchema, CreativeObj } from "@/schemas/assets";
+import { dataURLtoFile, getMediaMetadata, getVideoThumbnail } from "@/utils/helpers";
+import { creativeFormSchema, CreativeObj, designObj } from "@/schemas/assets";
+import { StoreType } from "polotno/model/store";
+import { fileURLToPath } from "url";
 
 const LayoutEditor = dynamic(() => import("@/components/layout-editor/editor"), {
   ssr: false, // 🚨 CRITICAL
 });
 
 export default function LayoutEditorPage() {
-  const { data: allAssets, isLoading: isLoadingAssets, refetch : refetchAssets } = trpc.creative.listAll.useQuery()
   const { mutateAsync: uploadCreative } = trpc.creative.add.useMutation()
   const { mutateAsync: deleteCreative } = trpc.creative.delete.useMutation()
+  const { data: allAssets, isLoading: isLoadingAssets, refetch : refetchAssets } = trpc.creative.listAll.useQuery()
+
   const { mutateAsync: uploadRSSResource } = trpc.rss.add.useMutation()
-  const { data: allRSS } = trpc.rss.listAll.useQuery()
+  const { data: allRSS, refetch: refetchRSS } = trpc.rss.listAll.useQuery()
+
+  const { mutateAsync: uploadDesign } = trpc.design.add.useMutation()
+  const { mutateAsync: deleteDesign } = trpc.design.delete.useMutation()
+  const { data : allDesigns, refetch: refetchDesigns } = trpc.design.listAll.useQuery()
+
 
   const { user } = useUser()
   const organization = user?.organizationMemberships[0];
+
+  const saveDesign = async (store: StoreType) => {
+    const design_json = store.toJSON();
+    const design_blob = await store.toBlob(); 
+
+    const id = cuid();
+    const thumbnail_filename = `${id}_design_thumbnail.png`
+    const thumbnail_file = new File([design_blob], thumbnail_filename, { type: "image/png" });
+    await uploadFileToWorker(thumbnail_file, thumbnail_filename, new AbortController().signal);
+
+    const in_design : designObj = {
+      id: cuid(),
+      name: thumbnail_filename,
+      tags: [],
+      design_obj: design_json,
+      orgId: "",
+    }
+    console.log(in_design);
+    await uploadDesign(in_design);
+  }
+
+  const removeDesign = async (design : designObj) => {
+    if(design) {
+      const url = design.name;
+      console.log("deleting from Worker design:", url)
+      await deleteFileFromWorker(url);
+    }
+    await deleteDesign({ id: design.id })
+  }
 
   const uploadAsset = async (file : File) => {
     const fileName = file.name;
@@ -82,14 +119,23 @@ export default function LayoutEditorPage() {
     await uploadRSSResource(in_rss);
   }
 
+  const refetchAll = async () => {
+    await refetchAssets();
+    await refetchDesigns();
+    await refetchRSS();
+  }
+
   return (
     <LayoutEditor
       creatives={allAssets ?? []}
       rssObjs={allRSS ?? []}
-      onRefresh={async () => {await refetchAssets()}}
+      designs={allDesigns ?? []}
+      onRefresh={refetchAll}
       uploadAsset={uploadAsset}
       deleteAsset={deleteAsset}
       uploadRSS={uploadRSS}
+      uploadDesign={saveDesign}
+      deleteDesign={removeDesign}
     />
   );
 }

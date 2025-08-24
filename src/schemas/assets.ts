@@ -146,3 +146,16 @@ type rssObjRender = z.infer<typeof rssObjRenderSchema>
 
 export const rssObjRenderSchemaList = z.array(rssObjRenderSchema)
 export type rssObjRenderList = z.infer<typeof rssObjRenderSchemaList>
+
+export const designSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tags: z.array(z.string()),
+  design_obj: z.any(),
+  orgId: z.string(),
+})
+
+export type designObj = z.infer<typeof designSchema>
+export const designSchemaList = z.array(designSchema)
+export type designList = z.infer<typeof designSchemaList>
+

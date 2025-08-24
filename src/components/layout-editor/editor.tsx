@@ -5,13 +5,16 @@ import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
 import { Toolbar } from 'polotno/toolbar/toolbar';
 import { PagesTimeline } from 'polotno/pages-timeline';
 import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
-import { BackgroundSection, ElementsSection, Section, SectionTab, SidePanel, TemplatesSection, TextSection } from 'polotno/side-panel';
+import { BackgroundSection, ElementsSection, Section, SectionTab, SidePanel, TemplatesSection, TextSection, DEFAULT_SECTIONS } from 'polotno/side-panel';
 import { Workspace } from 'polotno/canvas/workspace';
 import { createStore } from 'polotno/model/store';
 import { LayoutEditorProps } from '@/lib/type';
 import { MediaPanel} from './media-panel';
 import { BookText, LayoutTemplate, Rss, RssIcon } from 'lucide-react';
 import { RSSPanel } from './rss-panel';
+import { Button } from '@blueprintjs/core';
+import test from 'node:test';
+import { ActionControls, ToolbarTools } from './toolbar-tools';
 
 const store = createStore({
   key: 'iBbDdFxct_0aplfGoI8Q', // you can create it here: https://polotno.com/cabinet/
@@ -26,7 +29,7 @@ page.set({
   width: 1080,
 });
 
-export default function LayoutEditor ({creatives, rssObjs, onRefresh, uploadAsset, deleteAsset, uploadRSS} : LayoutEditorProps) {
+export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, uploadAsset, deleteAsset, uploadRSS, uploadDesign, deleteDesign} : LayoutEditorProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -57,9 +60,11 @@ export default function LayoutEditor ({creatives, rssObjs, onRefresh, uploadAsse
         <MediaPanel
           store={store}
           creatives={creatives}
+          designs={designs}
           onRefresh={onRefresh}
           uploadAsset={uploadAsset}
           deleteAsset={deleteAsset}
+          deleteDesign={deleteDesign}
           />
       );
     }),
@@ -87,14 +92,34 @@ export default function LayoutEditor ({creatives, rssObjs, onRefresh, uploadAsse
     }),
   } as Section; 
 
+  const ActionControls = ({ store }) => {
+    const [isSaving, setSaving] = React.useState(false);
+    const handleSave = async() => {
+      try {
+        setSaving(true)
+        await uploadDesign(store)
+        await onRefresh();
+      } finally {
+        setSaving(false)
+      }
+    }
+    return (
+      <div>
+        <Button
+          intent="primary"
+          onClick={handleSave}
+          loading={isSaving}
+        >
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
+      </div>
+    );
+  };
+
   const sections: Section[] = [MediaSection, RSSSection, TextSection, ElementsSection, BackgroundSection];
 
   return (
-    <PolotnoContainer style={{ width: '100vw', height: '90vh', position: 'relative'}}>
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/@blueprintjs/core@5/lib/css/blueprint.css"
-      />
+    <PolotnoContainer>
       <SidePanelWrap>
         <SidePanel 
           store={store} 
@@ -103,10 +128,11 @@ export default function LayoutEditor ({creatives, rssObjs, onRefresh, uploadAsse
           />
       </SidePanelWrap>
       <WorkspaceWrap>
-        <Toolbar store={store} />
+        <Toolbar store={store} components={{
+          ActionControls,
+        }}/>
         <Workspace store={store} />
         <ZoomButtons store={store} />
-        <PagesTimeline store={store} />
       </WorkspaceWrap>
     </PolotnoContainer>
   );

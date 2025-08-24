@@ -11,6 +11,8 @@ import {
   newCampaignFormSchema,
   rssObjSchema,
   rssObjSchemaList,
+  designSchema,
+  designSchemaList,
 } from '@/schemas/assets';
 import { db } from '../db'
 import {z} from 'zod'
@@ -318,3 +320,47 @@ export const rssRouter = router({
     }),
 });
 
+
+export const designRouter = router({
+  add : publicProcedure
+    .input(designSchema)
+    .mutation(async ({input}) => {
+      const res = db.design.create({
+        data: {
+          id: input.id,
+          name: input.name,
+          tags: input.tags,
+          design_obj: input.design_obj,
+          orgId: input.orgId,
+        }
+      });
+      return res;
+    }),
+
+  delete : publicProcedure
+    .input(z.object({
+      id: z.string()
+    }))
+    .mutation(async ({input}) => {
+      const data = await db.design.delete({
+        where: {id: input.id}
+      });
+      return data;
+    }),
+
+  listAll : publicProcedure
+    .output(designSchemaList)
+    .query(async () => {
+      const data = await db.design.findMany({
+        select: {
+          id: true,
+          tags: true,
+          name: true,
+          design_obj: true,
+          orgId: true,
+        }
+      });
+
+      return data;
+    }),
+});

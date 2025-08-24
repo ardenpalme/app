@@ -80,3 +80,14 @@ model rss_files {
 
   @@index([orgId])
 }
+
+model design {
+  id                 String                 @id @default(cuid())
+  name               String
+  tags               String[]               @default([])
+  design_obj         Json
+  orgId              String
+  createdAt          DateTime               @default(now())
+
+  @@index([orgId])
+}
