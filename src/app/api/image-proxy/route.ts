@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { get } from 'https';
 
+// Circumvents CORS restrictions
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url');
   if (!url) {
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
       const headers = new Headers({
         'Content-Type': res.headers['content-type'] || 'image/png',
         'Cache-Control': 'public, max-age=3600',
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': '*', 
       });
 
       resolve(

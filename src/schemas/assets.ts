@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { CreativeApprovalStatus, CampaignStatus } from '@prisma/client'
+import { type } from 'os';
 
 export const creativeFormSchema = z.object({
   id: z.string(),
@@ -134,18 +135,21 @@ export type rssObjList = z.infer<typeof rssObjSchemaList>
 export type rssObj = z.infer<typeof rssObjSchema>
 
 
+// Not used in TRPC APIs
 export const rssObjRenderSchema = z.object({
   id: z.string(),
   name: z.string(),
-  fileUrl: z.string(),
-  width: z.number().int().positive(),
-  height: z.number().int().positive(),
-  sourceUrl: z.string(),
+  fileUrl: z.string().nullable(),
+  width: z.number(),
+  height: z.number(),
+  sourceUrl: z.string().nullable(),
+  headlines: z.array(z.string())
 })
 type rssObjRender = z.infer<typeof rssObjRenderSchema>
 
 export const rssObjRenderSchemaList = z.array(rssObjRenderSchema)
 export type rssObjRenderList = z.infer<typeof rssObjRenderSchemaList>
+
 
 export const designSchema = z.object({
   id: z.string(),

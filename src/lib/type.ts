@@ -1,6 +1,8 @@
 import type { StoreType } from 'polotno/model/store'; 
 import { CreativeList, CreativeObj, designList, designObj, rssObjList } from "@/schemas/assets"
+import { z } from 'zod'
 import { ElementType } from 'polotno/model/group-model';
+import { FeedItem } from '@rowanmanning/feed-parser/lib/feed/item/base';
 
 export interface LayoutEditorProps {
   creatives: CreativeList;
@@ -35,4 +37,15 @@ export interface RSSPanelProps {
   rssObjs: rssObjList;
   uploadRSS: (rssUrl : string) => Promise<void>;
 }
+
+export type RSSImgObject = {
+  content_width: number;
+  content_height: number;
+  rss_item: FeedItem;
+}
+
+export type RSSTickerObject = { items: [{
+  title: string,
+  url: string
+}]}
 
