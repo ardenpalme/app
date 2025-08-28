@@ -13,8 +13,6 @@ import { MediaPanel} from './media-panel';
 import { BookText, LayoutTemplate, Rss, RssIcon } from 'lucide-react';
 import { RSSPanel } from './rss-panel';
 import { Button } from '@blueprintjs/core';
-import test from 'node:test';
-import { ActionControls, ToolbarTools } from './toolbar-tools';
 
 const store = createStore({
   key: 'iBbDdFxct_0aplfGoI8Q', // you can create it here: https://polotno.com/cabinet/
@@ -29,7 +27,7 @@ page.set({
   width: 1080,
 });
 
-export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, uploadAsset, deleteAsset, uploadRSS, uploadDesign, deleteDesign} : LayoutEditorProps) {
+export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, uploadAsset, deleteAsset, uploadRSS, deleteRSS, uploadDesign, deleteDesign} : LayoutEditorProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -48,7 +46,7 @@ export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, u
   const MediaSection = {
     name: 'media',
     Tab: (props) => (
-      <SectionTab {...props} name="Media">
+      <SectionTab {...props} name="Library">
         <div className='w-full h-full flex items-center justify-center'>
           <BookText className='w-5 h-5'/>
         </div>
@@ -85,8 +83,10 @@ export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, u
       return (
         <RSSPanel
           store={store}
+          onRefresh={onRefresh}
           rssObjs={rssObjs}
           uploadRSS={uploadRSS}
+          deleteRSS={deleteRSS}
           />
       );
     }),
@@ -116,7 +116,7 @@ export default function LayoutEditor ({creatives, rssObjs, designs, onRefresh, u
     );
   };
 
-  const sections: Section[] = [MediaSection, RSSSection, TextSection, ElementsSection, BackgroundSection];
+  const sections: Section[] = [MediaSection, RSSSection, TextSection, ElementsSection];
 
   return (
     <PolotnoContainer>

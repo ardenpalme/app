@@ -55,9 +55,12 @@ model Creative {
   fileSize           Int
 
   // Media Metadata
-  width              Int?
-  height             Int?
-  duration           Float?
+  width              Int
+  height             Int
+  duration           Float
+
+  playlist           Playlist?              @relation(fields: [playlistId], references: [id])
+  playlistId         String?
 
   campaign           Campaign?              @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   campaignId         String?
@@ -86,6 +89,17 @@ model design {
   name               String
   tags               String[]               @default([])
   design_obj         Json
+  orgId              String
+  createdAt          DateTime               @default(now())
+
+  @@index([orgId])
+}
+
+model Playlist {
+  id                 String                 @id @default(cuid())
+  name               String
+  durationSec        Int
+  assets             Creative[]
   orgId              String
   createdAt          DateTime               @default(now())
 

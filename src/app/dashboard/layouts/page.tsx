@@ -1,12 +1,12 @@
 "use client";
 
-import cuid from "cuid"
+import { createId } from "@paralleldrive/cuid2";
 import { useUser } from "@clerk/nextjs"
 import dynamic from "next/dynamic";
 import { deleteFileFromWorker, uploadFileToWorker } from "@/lib/r2-worker";
 import { trpc } from "@/app/_trpc/client";
 import { dataURLtoFile, getMediaMetadata, getVideoThumbnail } from "@/utils/helpers";
-import { creativeFormSchema, CreativeObj, designObj } from "@/schemas/assets";
+import { creativeFormSchema, CreativeObj, designObj, rssObj, rssObjRender } from "@/schemas/assets";
 import { StoreType } from "polotno/model/store";
 import { fileURLToPath } from "url";
 
@@ -20,6 +20,7 @@ export default function LayoutEditorPage() {
   const { data: allAssets, isLoading: isLoadingAssets, refetch : refetchAssets } = trpc.creative.listAll.useQuery()
 
   const { mutateAsync: uploadRSSResource } = trpc.rss.add.useMutation()
+  const { mutateAsync: deleteRSSResource } = trpc.rss.delte.useMutation()
   const { data: allRSS, refetch: refetchRSS } = trpc.rss.listAll.useQuery()
 
   const { mutateAsync: uploadDesign } = trpc.design.add.useMutation()
@@ -34,13 +35,13 @@ export default function LayoutEditorPage() {
     const design_json = store.toJSON();
     const design_blob = await store.toBlob(); 
 
-    const id = cuid();
+    const id = createId();
     const thumbnail_filename = `${id}_design_thumbnail.png`
     const thumbnail_file = new File([design_blob], thumbnail_filename, { type: "image/png" });
     await uploadFileToWorker(thumbnail_file, thumbnail_filename, new AbortController().signal);
 
     const in_design : designObj = {
-      id: cuid(),
+      id: createId(),
       name: thumbnail_filename,
       tags: [],
       design_obj: design_json,
@@ -74,7 +75,7 @@ export default function LayoutEditorPage() {
     await uploadFileToWorker(file, fileName, new AbortController().signal);
 
     const in_creative = {
-      id: cuid(),
+      id: createId(),
       name: file.name.replace(/\.[^/.]+$/, ""),
       notes: "",
       tags: [],
@@ -109,7 +110,7 @@ export default function LayoutEditorPage() {
 
   const uploadRSS = async (rssUrl: string) => {
     const in_rss = {
-      id: cuid(),
+      id: createId(),
       name: "",
       tags: [],
       url: rssUrl,
@@ -119,6 +120,11 @@ export default function LayoutEditorPage() {
     await uploadRSSResource(in_rss);
   }
 
+  const deleteRSS = async (rssItem: rssObjRender) => {
+    await deleteRSSResource({id: rssItem?.id ?? ""})
+  }
+
+  // TODO refresh should only refresh the required data
   const refetchAll = async () => {
     await refetchAssets();
     await refetchDesigns();
@@ -134,6 +140,7 @@ export default function LayoutEditorPage() {
       uploadAsset={uploadAsset}
       deleteAsset={deleteAsset}
       uploadRSS={uploadRSS}
+      deleteRSS={deleteRSS}
       uploadDesign={saveDesign}
       deleteDesign={removeDesign}
     />

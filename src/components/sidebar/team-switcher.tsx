@@ -18,17 +18,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { OrganizationMembershipResource } from "@clerk/types"
+import { Organization } from "@clerk/express"
+import Image from "next/image"
 
 export function TeamSwitcher({
-  teams,
+  orgs,
 }: {
-  teams: {
-    name: string
-    plan: string
-  }[]
+  orgs: OrganizationMembershipResource[]
 }) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam, setActiveTeam] = React.useState<OrganizationMembershipResource>(orgs[0])
 
   if (!activeTeam) {
     return null
@@ -38,17 +38,21 @@ export function TeamSwitcher({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
+          <DropdownMenuTrigger>
+            <SidebarMenuButton 
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <AudioWaveform className="size-4" />
+              <div className="relative size-8 aspect-square rounded-lg bg-sidebar-primary text-sidebar-primary-foreground overflow-hidden">
+                <Image
+                  src={`/api/image-proxy?url=${encodeURIComponent(activeTeam?.organization?.imageUrl ?? "")}`}
+                  alt={activeTeam?.organization?.slug ?? "org logo"}
+                  fill
+                  sizes="2rem"                 
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate font-medium">{activeTeam.organization.name}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -62,26 +66,18 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {orgs.map((org) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={org.organization.name}
+                onClick={() => setActiveTeam(org)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <AudioWaveform className="size-3.5 shrink-0" />
                 </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                {org.organization.name}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

@@ -100,3 +100,22 @@ export function dataURLtoFile(dataurl: string, filename: string): File {
   while (n--) u8arr[n] = bstr.charCodeAt(n);
   return new File([u8arr], filename, { type: mime });
 }
+
+export function calculateAspectRatio(width: number, height: number): string {
+  // handle edge cases
+  if (width <= 0 || height <= 0) {
+    throw new Error("Width and height must be positive numbers");
+  }
+
+  // Euclidean algorithm for gcd
+  const gcd = (a: number, b: number): number => {
+    return b === 0 ? a : gcd(b, a % b);
+  };
+
+  const divisor = gcd(width, height);
+
+  const w = width / divisor;
+  const h = height / divisor;
+
+  return `${w}:${h}`;
+}

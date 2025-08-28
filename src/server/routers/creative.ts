@@ -318,6 +318,18 @@ export const rssRouter = router({
       });
       return res;
     }),
+
+  delte : publicProcedure
+    .input(z.object({
+      id: z.string()
+    }))
+    .mutation(async ({input}) => {
+      const res = db.rss_files.delete({
+        where: {id: input.id}
+      });
+      return res;
+    }),
+
 });
 
 
@@ -364,3 +376,4 @@ export const designRouter = router({
       return data;
     }),
 });
+

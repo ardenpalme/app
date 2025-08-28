@@ -1,3 +1,5 @@
+"use client" 
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +17,8 @@ import { AudioWaveform, ChartPie, Folder, Frame, GalleryVerticalEnd, Logs, PenTo
 import Link from "next/link"
 import { NavUser } from "./sidebar/nav-user"
 import { TeamSwitcher } from "./sidebar/team-switcher"
+import { useEffect, useState } from "react"
+import { useUser } from "@clerk/nextjs";
 
 const menu_groups = [
   {
@@ -22,22 +26,22 @@ const menu_groups = [
     data: [
       {
         title: "Campaigns",
-        url: "/campaigns",
+        url: "/dashboard/campaigns",
         icon: Folder
       },
       {
         title: "Creatives",
-        url: "/creatives",
+        url: "/dashboard/creatives",
         icon: GalleryVerticalEnd
       },
       {
         title: "Design",
-        url: "/layouts",
+        url: "/dashboard/layouts",
         icon: PenTool
       },
       {
         title: "Playlists",
-        url: "/playlists",
+        url: "/dashboard/playlists",
         icon: Logs
       },
     ]
@@ -47,7 +51,7 @@ const menu_groups = [
     data: [
       {
         title: "Displays",
-        url: "/",
+        url: "/dashboard",
         icon: TvMinimal
       },
     ]
@@ -58,7 +62,7 @@ const menu_groups = [
     data: [
       {
         title: "Audience Analytics",
-        url: "/",
+        url: "/dashboard",
         icon: ChartPie
       },
     ]
@@ -84,10 +88,16 @@ const org_and_user_data= {
 }
 
 export function AppSidebar() {
+  const { isLoaded, user } = useUser();
+  const orgs = user?.organizationMemberships
+
+  if (!isLoaded) return null;
+  console.log(user, orgs);
+
   return (
     <Sidebar>
       <SidebarHeader>
-        <TeamSwitcher teams={org_and_user_data.org} />
+        <TeamSwitcher orgs={orgs} />
       </SidebarHeader>
       <SidebarContent>
         {menu_groups.map((group) => (
@@ -111,7 +121,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={org_and_user_data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

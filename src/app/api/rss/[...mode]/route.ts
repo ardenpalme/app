@@ -10,7 +10,7 @@ export async function GET(
   try {
     const { searchParams } = new URL(req.url);
     const rssUrl = searchParams.get("url"); 
-    const {mode} = await params;
+    const {mode} = params;
 
     if (!rssUrl) {
       return NextResponse.json({ error: 'Missing RSS feed URL' }, { status: 400 });

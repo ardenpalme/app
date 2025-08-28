@@ -1,6 +1,6 @@
 "use client"
 
-import cuid from "cuid"
+import { createId } from '@paralleldrive/cuid2';
 import { useState, useRef, useMemo, useEffect } from "react"
 import { useUser, useOrganization } from "@clerk/nextjs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -45,7 +45,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
       try {
         const metadata = await getMediaMetadata(file)
         newFiles.push({
-          tempId: cuid(),
+          tempId: createId(),
           file,
           previewUrl: URL.createObjectURL(file),
           progress: 0,
@@ -54,7 +54,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
         })
       } catch (error) {
         newFiles.push({
-          tempId: cuid(),
+          tempId: createId(),
           file,
           previewUrl: "",
           progress: 0,
@@ -101,12 +101,12 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
 
         const file = fileToUpload.file
         const fileExtension = file.name.split(".").pop()
-        const fileName = `${cuid()}.${fileExtension}`
+        const fileName = `${createId()}.${fileExtension}`
 
         await uploadFileToWorker(file, fileName, new AbortController().signal);
 
         const in_creative = {
-          id: cuid(),
+          id: createId(),
           name: file.name.replace(/\.[^/.]+$/, ""),
           notes: "",
           tags: [],

@@ -5,7 +5,7 @@ import { trpc } from "@/app/_trpc/client"
 import { Loader2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CampaignLibrary } from "./campaign-library"
-import { CreateCampaignDialog } from "../_components/create-campaign-dialog"
+import { CreateCampaignDialog } from "@/app/_components/create-campaign-dialog"
 
 export default function campaignsPage() {
   const [isNewCampDiagOpen, setNewCampDiagOpen] = useState(false)

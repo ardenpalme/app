@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { CreativeApprovalStatus, CampaignStatus } from '@prisma/client'
-import { type } from 'os';
 
 export const creativeFormSchema = z.object({
   id: z.string(),
@@ -12,9 +11,9 @@ export const creativeFormSchema = z.object({
   fileUrl: z.string(),
   fileType: z.string(),
   fileSize: z.number(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  duration: z.float64().optional(),
+  width: z.number(),
+  height: z.number(),
+  duration: z.float64(),
 
   // TODO add created At support here
   orgId: z.string(),
@@ -33,9 +32,9 @@ export const creativeSchema = z.object({
   fileUrl: z.string(),
   fileType: z.string(),
   fileSize: z.number(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  duration: z.float64().optional(),
+  width: z.number(),
+  height: z.number(),
+  duration: z.float64(),
 
   campaignId: z.string().optional().nullable(),
   campaign: z.object({
@@ -144,8 +143,8 @@ export const rssObjRenderSchema = z.object({
   height: z.number(),
   sourceUrl: z.string().nullable(),
   headlines: z.array(z.string())
-})
-type rssObjRender = z.infer<typeof rssObjRenderSchema>
+}).nullable()
+export type rssObjRender = z.infer<typeof rssObjRenderSchema>
 
 export const rssObjRenderSchemaList = z.array(rssObjRenderSchema)
 export type rssObjRenderList = z.infer<typeof rssObjRenderSchemaList>
@@ -163,3 +162,23 @@ export type designObj = z.infer<typeof designSchema>
 export const designSchemaList = z.array(designSchema)
 export type designList = z.infer<typeof designSchemaList>
 
+
+export const playlistSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  durationSec: z.number(),
+  assets: z.array(creativeSchema),
+  orgId: z.string(),
+})
+
+export type playlistObj = z.infer<typeof playlistSchema>
+export const playlistSchemaList = z.array(playlistSchema)
+export type playlistList = z.infer<typeof playlistSchemaList>
+
+
+export const editPlaylistFormSchema = z.object({
+  name: z.string(),
+  assets: z.array(creativeSchema)
+})
+
+export type editPlaylistForm = z.infer<typeof editPlaylistFormSchema>;

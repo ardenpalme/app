@@ -23,7 +23,7 @@ import { AssignCampaignDialog } from "@/app/_components/assign-campaign-dialog"
 import { CreativeList, CreativeObj, CampaignList } from "@/schemas/assets"
 import { LayoutGrid, List, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import { trpc } from "../_trpc/client"
+import { trpc } from "@/app/_trpc/client"
 import { deleteFileFromWorker } from "@/lib/r2-worker"
 import { CreateCampaignDialog } from "@/app/_components/create-campaign-dialog"
 
@@ -220,12 +220,10 @@ export function CreativeLibrary({
           onActionSuccess()
         }}
         onCreateCamp={()=>{
-          console.log("ICI PUTAIN FAIT CHIER")
           setCreateNewCamp(true)
           setAssignCreative(null)
         }}
         /> 
-
     </div>
   )
 }

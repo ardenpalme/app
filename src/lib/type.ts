@@ -1,5 +1,5 @@
 import type { StoreType } from 'polotno/model/store'; 
-import { CreativeList, CreativeObj, designList, designObj, rssObjList } from "@/schemas/assets"
+import { CreativeList, CreativeObj, designList, designObj, rssObj, rssObjList, rssObjRender, rssObjRenderList } from "@/schemas/assets"
 import { z } from 'zod'
 import { ElementType } from 'polotno/model/group-model';
 import { FeedItem } from '@rowanmanning/feed-parser/lib/feed/item/base';
@@ -12,6 +12,7 @@ export interface LayoutEditorProps {
   uploadAsset: (localFile : File) => Promise<void>;
   deleteAsset: (asset : CreativeObj) => Promise<void>;
   uploadRSS: (rssUrl : string) => Promise<void>;
+  deleteRSS: (rssItem : rssObjRender) => Promise<void>;
   uploadDesign: (store : StoreType) => Promise<void>;
   deleteDesign: (design : designObj) => Promise<void>;
 }
@@ -35,7 +36,9 @@ export interface ToolbarProps {
 export interface RSSPanelProps {
   store: StoreType;
   rssObjs: rssObjList;
+  onRefresh : () => Promise<void>;
   uploadRSS: (rssUrl : string) => Promise<void>;
+  deleteRSS: (rssItem : rssObjRender) => Promise<void>;
 }
 
 export type RSSImgObject = {
@@ -49,3 +52,8 @@ export type RSSTickerObject = { items: [{
   url: string
 }]}
 
+export type PlaylistItem = {
+  id: string,
+  aspectRatio: string,
+  asset: CreativeObj,
+}
