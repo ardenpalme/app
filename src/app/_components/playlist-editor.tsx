@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 import type { DropResult } from "@hello-pangea/dnd"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,10 +36,12 @@ import { ControllerRenderProps } from "react-hook-form"
 export function PlaylistEditor({
   form_fields,
   assets,
+  assetOrder,
   setAssetIdOrder
 } : {
   form_fields: ControllerRenderProps<editPlaylistForm, "assets">
   assets: CreativeList
+  assetOrder: string[]
   setAssetIdOrder : React.Dispatch<React.SetStateAction<string[]>>
 }) {
   const [playlistItems, setPlaylistItems] = useState<PlaylistItem[]>([])
@@ -103,9 +105,32 @@ export function PlaylistEditor({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
+  {/* on mount, load the assets in the saved order*/}
+  useEffect(() => {
+    const items : PlaylistItem[] = assets.map((asset) => {
+      const aspectRatio = calculateAspectRatio(asset?.width ?? 0, asset?.height ?? 0)
+      const item : PlaylistItem = {
+        id: createId(),
+        aspectRatio,
+        asset
+      }
+      return item
+    })
+    setPlaylistItems(items)
+
+    if(assetOrder) {
+      setPlaylistItems(prev => {
+        // if prev is [{ asset: { id: string, ... }, ... }]
+        const byId = new Map(prev.map(it => [it.asset.id, it]));
+        return assetOrder.map(id => byId.get(id)!);
+      });
+    }
+  },[])
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex flex-row p-2 gap-4 max-w-250 max-h-200">
+        {/* Draggable Media Library */}
         <Card className="w-90 flex-initial border-r ">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Media Library</CardTitle>
@@ -189,6 +214,7 @@ export function PlaylistEditor({
             </Droppable>
           </CardContent>
         </Card>
+        {/* Playlist Timeline */}
         <Card className="flex-initial w-200 border-r">
           <CardContent>
             <div className="flex items-center justify-between p-4 mb-4 bg-gray-100 rounded-lg">

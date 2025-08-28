@@ -100,6 +100,7 @@ model Playlist {
   name               String
   durationSec        Int
   assets             Creative[]
+  assetOrder         String[]
   orgId              String
   createdAt          DateTime               @default(now())
 

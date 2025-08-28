@@ -15,6 +15,7 @@ import { cn, formatBytes } from "@/lib/utils"
 import { uploadFileToWorker } from "@/lib/r2-worker"
 import { trpc } from "@/app/_trpc/client"
 import { CreativeForm, CreativeObj, MediaMetadata, mediaMetadataSchema } from "@/schemas/assets"
+import { getMediaMetadata } from '@/lib/media-metadata';
 
 
 type UploadingFile = {
@@ -44,6 +45,7 @@ const UploadNewAsset = ({ onUploadSuccess }: { onUploadSuccess: (creative: Creat
     for (const file of Array.from(files)) {
       try {
         const metadata = await getMediaMetadata(file)
+        console.log(metadata);
         newFiles.push({
           tempId: createId(),
           file,

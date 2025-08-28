@@ -168,6 +168,7 @@ export const playlistSchema = z.object({
   name: z.string(),
   durationSec: z.number(),
   assets: z.array(creativeSchema),
+  assetOrder: z.array(z.string()),
   orgId: z.string(),
 })
 
@@ -178,7 +179,8 @@ export type playlistList = z.infer<typeof playlistSchemaList>
 
 export const editPlaylistFormSchema = z.object({
   name: z.string(),
-  assets: z.array(creativeSchema)
+  assets: z.array(creativeSchema),
 })
 
 export type editPlaylistForm = z.infer<typeof editPlaylistFormSchema>;
+

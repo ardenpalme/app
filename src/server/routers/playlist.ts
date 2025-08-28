@@ -8,24 +8,6 @@ import {
 
 // link to the assets in Creative DB by id
 export const playlistRouter = router({
-  add : publicProcedure
-    .input(playlistSchema)
-    .mutation(async ({input}) => {
-      db.creative
-      const res = db.playlist.create({
-        data: {
-          id: input.id,
-          name: input.name,
-          durationSec: input.durationSec,
-          assets: {
-            connect: input.assets.map(asset => ({ id: asset.id })),
-          },
-          orgId: input.orgId,
-        }
-      });
-      return res;
-    }),
-
   delete : publicProcedure
     .input(z.object({
       id: z.string()
@@ -46,6 +28,7 @@ export const playlistRouter = router({
           name: true,
           durationSec: true,
           assets: true,
+          assetOrder: true,
           orgId: true,
         }
       });
@@ -64,6 +47,7 @@ export const playlistRouter = router({
           name: input.name,
           durationSec: input.durationSec,
           assets: { connect: ids},
+          assetOrder: input.assetOrder,
           orgId: input.orgId
         },
         update : {

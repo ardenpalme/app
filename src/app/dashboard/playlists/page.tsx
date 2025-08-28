@@ -12,7 +12,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { editPlaylistFormSchema, playlistObj } from "@/schemas/assets";
 import { Play } from "next/font/google";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react";
 import { unstable_noStore } from "next/cache";
@@ -75,21 +75,30 @@ export default function Playlists() {
   })
 
   async function onSubmit(values: z.infer<typeof editPlaylistFormSchema>) {
+    const id= selectedPlaylist?.id ?? createId();
     const orgId = orgs?.[0].id
     const playlistData = {
-      id: createId(),
+      id: id,
       name: values.name,
       durationSec: playlistDurationSec,
       assets: values.assets,
+      assetOrder: assetIDOrder,
       orgId: orgId ?? ""
     }
 
     console.log(playlistData)
-    await upsertPlaylist(playlistData )
+    await upsertPlaylist(playlistData)
     await refetchPlaylists();
     setNewPlaylistDialogOpen(false)
     setSelectedPlaylist(null)
   }
+
+  useEffect(() => {
+    form.reset({
+      name: selectedPlaylist?.name ?? '',
+      assets: selectedPlaylist?.assets ?? [],
+    })
+  }, [selectedPlaylist, form])
 
   if(!playlists || !isUserLoaded) return null;
 
@@ -205,6 +214,7 @@ export default function Playlists() {
                             <PlaylistEditor
                               form_fields={field}
                               assets={allAssets ?? []}
+                              assetOrder={!!selectedPlaylist ? selectedPlaylist.assetOrder : []}
                               setAssetIdOrder={setAssetIdOrder}
                             />
                           </div>
