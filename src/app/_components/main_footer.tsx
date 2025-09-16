@@ -9,10 +9,16 @@ export default function Footer() {
               <div className="flex items-center space-x-2 mb-4">
                 <Image src="/logo_white.svg" alt="Company Logo" width={24} height={24} className="h-8 w-32" />
               </div>
-              <p className="text-gray-400 mb-4">
-                AI-powered DOOH analytics platform helping mall owners maximize digital advertising revenue through
-                precise audience insights.
-              </p>
+              <div className="text-gray-400 mb-4">
+                <p className="text-sm">
+                  30 North Gould Street
+                  <br />
+                  Sheridan, WY 82801, USA
+                  <br />
+                  (307) 207-5967
+                </p>
+              </div>
+
               <div className="flex space-x-4">
                 <Link href="#" className="text-gray-400 hover:text-white">
                   LinkedIn

@@ -43,11 +43,6 @@ export default function Navbar() {
                 Products
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href="/research" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-base font-medium text-gray-600 transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                Research
-              </NavigationMenuLink>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -60,19 +55,21 @@ export default function Navbar() {
         </button>
 
         <div className="flex flex-row gap-4">
-          <SignedIn>
-            <SignOutButton/>
-            <Button size="sm" asChild>
-              <div className="flex flex-row">
-                <Link href="/dashboard" target="_blank" rel="noopener noreferrer">Dashboard</Link>
-                <ArrowUpRight/>
-              </div>
-            </Button>
-          </SignedIn>
+          {/*
+            <SignedIn>
+              <SignOutButton/>
+              <Button size="sm" asChild>
+                <div className="flex flex-row">
+                  <Link href="/dashboard" target="_blank" rel="noopener noreferrer">Dashboard</Link>
+                  <ArrowUpRight/>
+                </div>
+              </Button>
+            </SignedIn>
 
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+          */}
 
           <ContactForm/>
         </div>
