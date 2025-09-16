@@ -50,6 +50,7 @@ export default function RootLayout({
           </TRPCProvider>
         </div>
       </SidebarInset>
-    </SidebarProvider>
-  )
+    </SidebarProvider> 
+  );
+
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEvents } from "@/context/events-context";
+import "@/styles/calendar.css";
 import {
   DateSelectArg,
   DayCellContentArg,
@@ -23,6 +24,7 @@ import { getDateFromMinutes } from "@/lib/utils";
 import { Card } from "./ui/card";
 import { EventEditForm } from "./event-edit-form";
 import { EventView } from "./event-view";
+import { CalendarProps } from "@/lib/type";
 
 type EventItemProps = {
   info: EventContentArg;
@@ -36,7 +38,7 @@ type DayRenderProps = {
   info: DayCellContentArg;
 };
 
-export default function Calendar() {
+export default function Calendar({creatives, designs, playlists, orgId} : CalendarProps ) {
   const { events, setEventAddOpen, setEventEditOpen, setEventViewOpen } =
     useEvents();
 
@@ -55,8 +57,6 @@ export default function Calendar() {
   const handleEventClick = (info: EventClickArg) => {
     const event: CalendarEvent = {
       id: info.event.id,
-      title: info.event.title,
-      description: info.event.extendedProps.description,
       backgroundColor: info.event.backgroundColor,
       start: info.event.start!,
       end: info.event.end!,
@@ -71,8 +71,6 @@ export default function Calendar() {
   const handleEventChange = (info: EventChangeArg) => {
     const event: CalendarEvent = {
       id: info.event.id,
-      title: info.event.title,
-      description: info.event.extendedProps.description,
       backgroundColor: info.event.backgroundColor,
       start: info.event.start!,
       end: info.event.end!,
@@ -80,8 +78,6 @@ export default function Calendar() {
 
     const oldEvent: CalendarEvent = {
       id: info.oldEvent.id,
-      title: info.oldEvent.title,
-      description: info.oldEvent.extendedProps.description,
       backgroundColor: info.oldEvent.backgroundColor,
       start: info.oldEvent.start!,
       end: info.oldEvent.end!,
@@ -101,10 +97,11 @@ export default function Calendar() {
       <div className="overflow-hidden w-full">
         {info.view.type == "dayGridMonth" ? (
           <div
+            style={{ backgroundColor: info.backgroundColor }}
             className={`flex flex-col rounded-md w-full px-2 py-1 line-clamp-1 text-[0.5rem] sm:text-[0.6rem] md:text-xs`}
           >
             <p className="font-semibold text-gray-950 line-clamp-1 w-11/12">
-              {event.title}
+              Event Title
             </p>
 
             <p className="text-gray-800">{left}</p>
@@ -113,7 +110,7 @@ export default function Calendar() {
         ) : (
           <div className="flex flex-col space-y-0 text-[0.5rem] sm:text-[0.6rem] md:text-xs">
             <p className="font-semibold w-full text-gray-950 line-clamp-1">
-              {event.title}
+              Event Title
             </p>
             <p className="text-gray-800 line-clamp-1">{`${left} - ${right}`}</p>
           </div>
@@ -180,7 +177,6 @@ export default function Calendar() {
   const handleDateSelect = (info: DateSelectArg) => {
     setSelectedStart(info.start);
     setSelectedEnd(info.end);
-    setEventAddOpen(true);
   };
 
   const earliestHour = getDateFromMinutes(earliestTime)
@@ -202,6 +198,11 @@ export default function Calendar() {
 
   const calendarEarliestTime = `${earliestHour}:${earliestMin}`;
   const calendarLatestTime = `${latestHour}:${latestMin}`;
+
+  const toDuration = (mins: number) => ({
+    hours: Math.floor(mins / 60),
+    minutes: mins % 60,
+  });
 
   return (
     <div className="space-y-5">
@@ -225,8 +226,8 @@ export default function Calendar() {
           ]}
           initialView="timeGridWeek"
           headerToolbar={false}
-          slotMinTime={calendarEarliestTime}
-          slotMaxTime={calendarLatestTime}
+          slotMinTime={"06:00"}
+          slotMaxTime={"23:59"}
           allDaySlot={false}
           firstDay={1}
           height={"32vh"}
@@ -264,6 +265,10 @@ export default function Calendar() {
         event={selectedEvent}
         isDrag={isDrag}
         displayButton={false}
+        orgId={orgId}
+        creatives={creatives}
+        designs={designs}
+        playlists={playlists}
       />
       <EventView event={selectedEvent} />
     </div>

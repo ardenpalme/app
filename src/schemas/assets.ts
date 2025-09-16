@@ -45,6 +45,7 @@ export const creativeSchema = z.object({
 
   submittedBy: z.string(),
   submissionDate: z.date(),
+
 });
 export type CreativeObj = z.infer<typeof creativeSchema>
 

@@ -1,8 +1,9 @@
 import type { StoreType } from 'polotno/model/store'; 
-import { CreativeList, CreativeObj, designList, designObj, rssObj, rssObjList, rssObjRender, rssObjRenderList } from "@/schemas/assets"
+import { CreativeList, CreativeObj, designList, designObj, playlistList, rssObj, rssObjList, rssObjRender, rssObjRenderList } from "@/schemas/assets"
 import { z } from 'zod'
 import { ElementType } from 'polotno/model/group-model';
 import { FeedItem } from '@rowanmanning/feed-parser/lib/feed/item/base';
+import { contentBase } from '@/schemas/content';
 
 export interface LayoutEditorProps {
   creatives: CreativeList;
@@ -56,4 +57,20 @@ export type PlaylistItem = {
   id: string,
   aspectRatio: string,
   asset: CreativeObj,
+}
+
+export interface ContentSelectorProps {
+  orgId: string;
+  creatives: CreativeList;
+  designs: designList;
+  playlists: playlistList;
+  onChange: (content: contentBase) => void;
+  currContent: contentBase | null;
+}
+
+export interface CalendarProps {
+  creatives: CreativeList;
+  designs: designList;
+  playlists: playlistList;
+  orgId: string;
 }

@@ -44,6 +44,7 @@ export function EventView({ event }: EventViewProps) {
                 <td>
                   <div
                     className="rounded-full w-5 h-5"
+                    style={{ backgroundColor: event?.backgroundColor }}
                   ></div>
                 </td>
               </tr>

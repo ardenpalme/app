@@ -22,19 +22,10 @@ export function EventDeleteForm({ id, title }: EventDeleteFormProps) {
   const { deleteEvent } = useEvents();
   const { eventDeleteOpen, setEventDeleteOpen, setEventViewOpen } = useEvents();
 
-
   async function onSubmit() {
     deleteEvent(id!);
     setEventDeleteOpen(false);
     setEventViewOpen(false);
-    {/*
-    toast({
-      title: "Event deleted!",
-      action: (
-        <ToastAction altText={"Dismiss notification."}>Dismiss</ToastAction>
-      ),
-    });
-    */}
   }
 
   return (

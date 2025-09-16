@@ -25,10 +25,10 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
-import { TextArea } from "@blueprintjs/core"
+import { Textarea } from "@/components/ui/textarea"
  
 const formSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   message: z.string().max(800)
 })
 
@@ -51,7 +51,6 @@ export function ContactForm() {
       form.reset();
       setOpen(false);
     } catch (e) {
-      // show error toast, keep dialog open
     }
   }
 
@@ -91,7 +90,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel>Message</FormLabel>
                   <FormControl>
-                    <TextArea placeholder="Type your message here." {...field}/>
+                    <Textarea placeholder="Type your message here." {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

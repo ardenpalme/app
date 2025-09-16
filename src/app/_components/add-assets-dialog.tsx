@@ -17,7 +17,6 @@ import { trpc } from "@/app/_trpc/client"
 import { CreativeForm, CreativeObj, MediaMetadata, mediaMetadataSchema } from "@/schemas/assets"
 import { getMediaMetadata } from '@/lib/media-metadata';
 
-
 type UploadingFile = {
   tempId: string
   file: File

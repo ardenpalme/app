@@ -28,15 +28,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
-import { DateTimePicker } from "./date-picker";
 import { useEvents } from "@/context/events-context";
+import { DateTimePicker } from "./date-time-picker";
 
 const eventAddFormSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  start: z.date(),
-  end: z.date(),
-  color: z.string(),
+  title: z
+    .string({ required_error: "Please enter a title." })
+    .min(1, { message: "Must provide a title for this event." }),
+  description: z
+    .string({ required_error: "Please enter a description." })
+    .min(1, { message: "Must provide a description for this event." }),
+  start: z.date({
+    required_error: "Please select a start time",
+    invalid_type_error: "That's not a date!"
+  }),
+  end: z.date({
+    required_error: "Please select an end time",
+    invalid_type_error: "That's not a date!"
+  }),
+  color: z
+    .string({ required_error: "Please select an event color." })
+    .min(1, { message: "Must provide a title for this event." })
 });
 
 type EventAddFormValues = z.infer<typeof eventAddFormSchema>;
@@ -74,20 +86,8 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
       end: data.end,
       color: data.color
     };
-    console.log(newEvent);
-
     addEvent(newEvent);
     setEventAddOpen(false);
-    {/*
-    toast({
-      title: "Event added!",
-      action: (
-        <ToastAction altText={"Click here to dismiss notification"}>
-          Dismiss
-        </ToastAction>
-      )
-    });
-    */}
   }
 
   return (
@@ -147,10 +147,8 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                   <FormLabel htmlFor="datetime">Start</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value}
+                      currDate={field.value}
                       onChange={field.onChange}
-                      hourCycle={12}
-                      granularity="minute"
                     />
                   </FormControl>
                   <FormMessage />
@@ -165,10 +163,8 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                   <FormLabel htmlFor="datetime">End</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value}
+                      currDate={field.value}
                       onChange={field.onChange}
-                      hourCycle={12}
-                      granularity="minute"
                     />
                   </FormControl>
                   <FormMessage />

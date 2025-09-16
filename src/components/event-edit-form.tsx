@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { object, z } from "zod";
 import {
   Form,
   FormControl,
@@ -26,19 +26,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { DateTimePicker } from "./date-picker";
+import { DateTimePicker } from "./date-time-picker";
 import { useEvents } from "@/context/events-context";
 import { CalendarEvent } from "@/utils/data";
 import { Button } from "./ui/button";
+import { contentBaseSchema } from "@/schemas/content";
+import { Content } from "next/font/google";
+import { ContentSelector } from "./content-selector";
+import { designRouter } from "@/server/routers/creative";
+import { CreativeList, designList, playlistList } from "@/schemas/assets";
 
 const eventEditFormSchema = z.object({
   id: z.string(),
-  title: z
-    .string({ required_error: "Please enter a title." })
-    .min(1, { message: "Must provide a title for this event." }),
-  description: z
-    .string({ required_error: "Please enter a description." })
-    .min(1, { message: "Must provide a description for this event." }),
   start: z.date({
     required_error: "Please select a start time",
     invalid_type_error: "That's not a date!",
@@ -50,6 +49,7 @@ const eventEditFormSchema = z.object({
   color: z
     .string({ required_error: "Please select an event color." })
     .min(1, { message: "Must provide a title for this event." }),
+  content: contentBaseSchema.nullable()
 });
 
 type EventEditFormValues = z.infer<typeof eventEditFormSchema>;
@@ -61,15 +61,26 @@ interface EventEditFormProps {
   displayButton: boolean;
 }
 
+interface EventEditFormFuncProps extends EventEditFormProps {
+  orgId: string;
+  creatives: CreativeList;
+  designs: designList;
+  playlists: playlistList;
+}
+
+
 export function EventEditForm({
   oldEvent,
   event,
   isDrag,
   displayButton,
-}: EventEditFormProps) {
+  orgId,
+  creatives,
+  designs,
+  playlists,
+}: EventEditFormFuncProps) {
   const { addEvent, deleteEvent } = useEvents();
   const { eventEditOpen, setEventEditOpen } = useEvents();
-
 
   const form = useForm<z.infer<typeof eventEditFormSchema>>({
     resolver: zodResolver(eventEditFormSchema),
@@ -79,11 +90,10 @@ export function EventEditForm({
     if (isDrag && oldEvent) {
       const resetEvent = {
         id: oldEvent.id,
-        title: oldEvent.title,
-        description: oldEvent.description,
         start: oldEvent.start,
         end: oldEvent.end,
         color: oldEvent.backgroundColor!,
+        content: null,
       };
 
       deleteEvent(oldEvent.id);
@@ -95,8 +105,6 @@ export function EventEditForm({
   useEffect(() => {
     form.reset({
       id: event?.id,
-      title: event?.title,
-      description: event?.description,
       start: event?.start as Date,
       end: event?.end as Date,
       color: event?.backgroundColor,
@@ -106,26 +114,14 @@ export function EventEditForm({
   async function onSubmit(data: EventEditFormValues) {
     const newEvent = {
       id: data.id,
-      title: data.title,
-      description: data.description,
       start: data.start,
       end: data.end,
       color: data.color,
+      content: data.content,
     };
     deleteEvent(data.id);
     addEvent(newEvent);
     setEventEditOpen(false);
-
-    {/*
-    toast({
-      title: "Event edited!",
-      action: (
-        <ToastAction altText={"Click here to dismiss notification"}>
-          Dismiss
-        </ToastAction>
-      ),
-    });
-    */}
   }
 
   return (
@@ -144,41 +140,11 @@ export function EventEditForm({
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Edit {event?.title}</AlertDialogTitle>
+          <AlertDialogTitle>Edit Event</AlertDialogTitle>
         </AlertDialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2.5">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Standup Meeting" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Daily session"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="start"
@@ -187,10 +153,8 @@ export function EventEditForm({
                   <FormLabel htmlFor="datetime">Start</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value}
+                      currDate={field.value}
                       onChange={field.onChange}
-                      hourCycle={12}
-                      granularity="minute"
                     />
                   </FormControl>
                   <FormMessage />
@@ -205,11 +169,29 @@ export function EventEditForm({
                   <FormLabel htmlFor="datetime">End</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value}
+                      currDate={field.value}
                       onChange={field.onChange}
-                      hourCycle={12}
-                      granularity="minute"
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="content"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Content:</FormLabel>
+                  <FormControl>
+                    <ContentSelector 
+                      orgId={orgId}
+                      creatives={creatives}
+                      designs={designs}
+                      playlists={playlists}
+                      currContent={field.value}
+                      onChange={field.onChange}
+                      />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

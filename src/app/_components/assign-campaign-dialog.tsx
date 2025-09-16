@@ -14,7 +14,6 @@ import { Select, SelectLabel, SelectGroup, SelectContent, SelectItem, SelectTrig
 import { Loader2 } from "lucide-react"
 import { trpc } from "@/app/_trpc/client"
 import type { CreativeObj } from "@/schemas/assets"
-import { toast } from "sonner"
 import { CreativeUpdateCampaignSchema } from "@/schemas/assets"
 
 export function AssignCampaignDialog({
@@ -39,9 +38,9 @@ export function AssignCampaignDialog({
 
     } catch(err) {
       if(err instanceof Error) {
-        toast.error("Failed to assign campaign", { description: err.message })
+        console.error("Failed to assign campaign", { description: err.message })
       }else{
-        toast.error("Uknown Error")
+        console.error("Uknown Error")
       }
     }
   }

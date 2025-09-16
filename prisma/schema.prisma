@@ -19,22 +19,28 @@ enum CreativeApprovalStatus {
   REJECTED
 }
 
+enum ContentType {
+  CREATIVE
+  DESIGN
+  PLAYLIST
+}
+
 
 model Campaign {
-  id             String         @id @default(cuid())
-  name           String
-  startDate      DateTime
-  endDate        DateTime
-  status         CampaignStatus @default(PENDING)
-  notes          String?
-  userId         String
-  orgId          String
-  creatives      Creative[]
+  id                  String                @id @default(cuid())
+  name               String
+  startDate          DateTime
+  endDate            DateTime
+  status             CampaignStatus         @default(PENDING)
+  notes              String?
+  userId             String
+  orgId              String
+  creatives          Creative[]
 
-  submittedBy    String?
-  submissionDate DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  submittedBy        String?
+  submissionDate     DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 
   @@index([orgId])
 }
@@ -59,16 +65,18 @@ model Creative {
   height             Int
   duration           Float
 
+  submittedBy        String
+  submissionDate     DateTime
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
   playlist           Playlist?              @relation(fields: [playlistId], references: [id])
   playlistId         String?
 
   campaign           Campaign?              @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   campaignId         String?
 
-  submittedBy        String
-  submissionDate     DateTime
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @updatedAt
+  content            Content?               @relation("CreativeContent")
 
   @@index([orgId])
 }
@@ -84,13 +92,15 @@ model rss_files {
   @@index([orgId])
 }
 
-model design {
+model Design {
   id                 String                 @id @default(cuid())
   name               String
   tags               String[]               @default([])
   design_obj         Json
   orgId              String
   createdAt          DateTime               @default(now())
+
+  content            Content?               @relation("DesignContent")
 
   @@index([orgId])
 }
@@ -104,5 +114,55 @@ model Playlist {
   orgId              String
   createdAt          DateTime               @default(now())
 
+  content            Content?               @relation("PlaylistContent")
+
+  @@index([orgId])
+}
+
+model Content {
+  id                 String                 @id @default(cuid())
+  orgId              String
+  type               ContentType
+
+  creativeId         String?                @unique
+  designId           String?                @unique
+  playlistId         String?                @unique
+
+  creative           Creative?              @relation("CreativeContent", fields: [creativeId], references: [id])
+  design             Design?                @relation("DesignContent",   fields: [designId],   references: [id])
+  playlist           Playlist?              @relation("PlaylistContent", fields: [playlistId], references: [id])
+
+  schedules          Schedule[]
+
+  @@index([orgId])
+}
+
+
+model Schedule {
+  id                 String                 @id @default(cuid())
+  start              DateTime
+  end                DateTime
+
+  // Will the content run forever with no time bounds?
+  isInf              Boolean                
+
+  // This content will run from start-time to end-time
+  content            Content?               @relation(fields: [contentId], references: [id])
+  contentId          String?
+
+  displays           Display[]              @relation("ScheduleDisplays")
+
+  orgId              String
+  @@index([orgId])
+}
+
+model Display {
+  id                 String                 @id @default(cuid())
+  name               String
+  tags               String[]
+
+  schedules          Schedule[]             @relation("ScheduleDisplays")
+
+  orgId              String
   @@index([orgId])
 }

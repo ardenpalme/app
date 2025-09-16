@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUser, useOrganization } from "@clerk/nextjs"
 import { z } from "zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -61,18 +60,18 @@ export function CreateCampaignDialog({
 
     } catch(err) {
       if(err instanceof Error) {
-        toast.error("Failed to create campaign", {
+        console.error("Failed to create campaign", {
           description: err.message,
         })
       }else{
-        toast.error("Unkown Error")
+        console.error("Unkown Error")
       }
     }
   }
 
   function onSubmit(data: NewCampaignFormSchema) {
     if(data.endDate < data.startDate) {
-      toast.error("Invalid Date Range")
+      console.error("Invalid Date Range")
     }else {
       createCampaign(data)
     }

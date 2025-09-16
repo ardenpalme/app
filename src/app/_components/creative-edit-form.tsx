@@ -7,7 +7,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -54,13 +53,12 @@ export function CreativeEditForm({
       console.log("submitted form")
       const res = await updateCreative(data);
       console.log(res)
-      toast.success("Creative has been resubmitted for review.")
       onSuccess();
     } catch(err) {
       if(err instanceof Error) {
-        toast.error("Failed to resubmit creative", { description: err.message });
+        console.error("Failed to resubmit creative", { description: err.message });
       }else{
-        toast.error("Unknown Error")
+        console.error("Unknown Error")
       }
     }
   }

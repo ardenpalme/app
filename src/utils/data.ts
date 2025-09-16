@@ -1,3 +1,4 @@
+import { contentBase } from "@/schemas/content";
 import FullCalendar from "@fullcalendar/react";
 import { RefObject } from "react";
 
@@ -65,11 +66,10 @@ const currentDate = new Date();
 
 export interface CalendarEvent {
   id: string;
-  title: string;
   start: Date;
   end: Date;
   backgroundColor?: string;
-  description: string;
+  content: contentBase | null;
 }
 
 export const initialEvents: CalendarEvent[] = [

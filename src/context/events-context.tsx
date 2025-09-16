@@ -1,4 +1,5 @@
 "use client";
+import { contentBase } from "@/schemas/content";
 import { CalendarEvent, initialEvents } from "@/utils/data";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
@@ -9,6 +10,7 @@ interface Event {
   start: Date;
   end: Date;
   color: string;
+  content: contentBase | null;
 }
 
 interface EventsContextType {
@@ -45,6 +47,7 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({
       ...event,
       id: String(event.id),
       color: event.backgroundColor,
+      content: null
     }))
   );
   const [eventViewOpen, setEventViewOpen] = useState(false);

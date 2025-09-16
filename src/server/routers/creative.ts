@@ -6,7 +6,6 @@ import {
   creativeSchema,
   CreativeEditSchema,
   creativeUpdateCampaignSchema,
-  uploadcampaignSchema,
   uploadcampaignSchemaList,
   newCampaignFormSchema,
   rssObjSchema,
@@ -84,9 +83,6 @@ export const creativeRouter = router({
           name: input.name,
           notes: input.notes,
           tags: input.tags,
-          proofOfPlay: input.proofOfPlay,
-          submissionDate: input.submissionDate,
-          submittedBy: input.submittedBy
         }
       });
       return data;
@@ -329,9 +325,7 @@ export const rssRouter = router({
       });
       return res;
     }),
-
 });
-
 
 export const designRouter = router({
   add : publicProcedure
@@ -376,4 +370,3 @@ export const designRouter = router({
       return data;
     }),
 });
-

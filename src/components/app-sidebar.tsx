@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { AudioWaveform, ChartPie, Folder, Frame, GalleryVerticalEnd, Logs, PenTool, TvMinimal} from "lucide-react"
+import { AudioWaveform, Calendar, ChartPie, Folder, Frame, GalleryVerticalEnd, Logs, PenTool, TvMinimal} from "lucide-react"
 import Link from "next/link"
 import { NavUser } from "./sidebar/nav-user"
 import { TeamSwitcher } from "./sidebar/team-switcher"
@@ -44,6 +44,11 @@ const menu_groups = [
         url: "/dashboard/playlists",
         icon: Logs
       },
+      {
+        title: "Schedule",
+        url: "/dashboard/calendar",
+        icon: Calendar
+      },
     ]
   },
   {
@@ -68,24 +73,6 @@ const menu_groups = [
     ]
   }
 ]
-
-const org_and_user_data= {
-  org: [
-    {
-      name: "Acme Inc",
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      plan: "Startup",
-    }
-  ],
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-}
 
 export function AppSidebar() {
   const { isLoaded, user } = useUser();
